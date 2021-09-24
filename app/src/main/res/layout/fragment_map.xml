@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".Fragment.FragmentMap">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/layoutTopMap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/navibar">
+
+                <ImageView
+                    android:id="@+id/locationBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/btn_loca" />
+
+                <ImageView
+                    android:id="@+id/backBtnMap"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentLeft="true"
+                    android:background="@drawable/btn_back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+
+                    android:text="정류장 선택"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+            </RelativeLayout>
+
+            <fragment
+                android:id="@+id/mapView"
+                android:name="com.naver.maps.map.MapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/layoutTopMap" />
+
+            <!--        <com.naver.maps.map.MapView-->
+            <!--            android:id="@+id/mapView_naver"-->
+            <!--            android:layout_width="match_parent"-->
+            <!--            android:layout_height="match_parent"-->
+            <!--            android:layout_below="@+id/layoutTopMap" />-->
+
+            <RelativeLayout
+                android:id="@+id/searchBusStopLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layoutTopMap"
+                android:layout_marginTop="15dp">
+
+                <ImageView
+                    android:id="@+id/searchBusStopImg"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="25dp"
+                    android:background="@drawable/rounded_corner_gray" />
+
+                <EditText
+                    android:id="@+id/searchBusStopName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/searchBusStopImg"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_toStartOf="@+id/searchBusStopBtn"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="버스정류장 이름을 검색해주세요."
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLength="50"
+                    android:singleLine="true"
+                    android:textColor="#000"
+                    android:textColorHint="#989898"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/searchBusStopBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@+id/searchBusStopImg"
+                    android:layout_centerVertical="true"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="19dp"
+                    android:src="@drawable/btn_search" />
+
+            </RelativeLayout>
+
+
+            <com.naver.maps.map.widget.ZoomControlView
+                android:id="@+id/zoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/searchBusStopLayout"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="100dp"
+                android:layout_marginRight="10dp" />
+
+
+            <RelativeLayout
+                android:id="@+id/searchResultContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/searchBusStopLayout"
+                android:layout_marginTop="10dp">
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
+                    android:background="@drawable/search_result_container">
+
+                    <LinearLayout
+                        android:id="@+id/searchResultSmallContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </ScrollView>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/busStopInfoContainer_map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:id="@+id/busStopInfoSmallContainer_map"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/rounded_corner_non">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_margin="15dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/busStopNumber_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dp"
+                            android:fontFamily="@font/nanum_square_b"
+                            android:text="버스정류장번호"
+                            android:textColor="@color/blue"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/busStopName_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nanum_square_b"
+                            android:text="강원대정문"
+                            android:textColor="@color/black"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:id="@+id/nextButStopName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="춘천역환승센터"
+                            android:textColor="@color/gray"
+                            android:textSize="16sp" />
+
+
+                        <TextView
+                            android:id="@+id/nextBtn_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp"
+                            android:background="@drawable/btn_ok"
+                            android:gravity="center"
+                            android:text="다음"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="18sp" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+    </FrameLayout>
+
+</layout>

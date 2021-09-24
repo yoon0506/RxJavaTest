@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:id="@+id/busInfoContainer_busSelection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/rounded_corner_non">
+
+        <TextView
+            android:id="@+id/busNumber_busSelection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:fontFamily="@font/nanum_square_b"
+            android:text="300번"
+            android:textColor="@color/purple"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/finalBusStopInfo_busSelection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/busNumber_busSelection"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="11dp"
+            android:text="사우사거리 방향"
+            android:textColor="@color/gray_info"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:id="@+id/transitCenterInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/finalBusStopInfo_busSelection"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center_vertical"
+            >
+
+            <TextView
+                android:background="@drawable/rounded_corner_purple"
+                android:id="@+id/currentBusStop_busSelection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="현재정류장"
+                android:textColor="@color/darkGray"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/direction_busSelection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/direction_p" />
+
+            <TextView
+                android:id="@+id/nextBusStop_busSelection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="다음정류장"
+                android:textColor="@color/darkGray"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

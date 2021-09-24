@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/loadingLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    tools:context=".Fragment.FragmentLoading">
+
+    <RelativeLayout
+        android:id="@+id/background_B"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/loadingImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/loading"
+            android:stateListAnimator="@null"
+            android:visibility="invisible" />
+
+        <!--        <ImageView-->
+        <!--            android:id="@+id/loadingImg"-->
+        <!--            android:layout_width="89dp"-->
+        <!--            android:layout_height="10dp"-->
+        <!--            android:layout_centerInParent="true"-->
+        <!--            android:background="@drawable/loading"-->
+        <!--            android:stateListAnimator="@null"-->
+        <!--            android:visibility="invisible" />-->
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/navibarTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/navibar"
+        android:visibility="invisible" />
+
+    <RelativeLayout
+        android:id="@+id/backgroundForGetBusData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bus_top_btn_non_selected"
+        android:visibility="invisible"
+        >
+
+        <ImageView
+            android:id="@+id/loadingImgForGetBusData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/loading"
+            android:layout_centerInParent="true"
+            android:stateListAnimator="@null"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/backgroundForMain_B"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/navibarTop"
+        android:background="@color/white"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/loadingImgForMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/loading"
+            android:stateListAnimator="@null"
+            android:visibility="invisible" />
+
+        <!--        <ImageView-->
+        <!--            android:id="@+id/loadingImgForMain"-->
+        <!--            android:layout_width="89dp"-->
+        <!--            android:layout_height="10dp"-->
+        <!--            android:layout_centerInParent="true"-->
+        <!--            android:layout_centerVertical="true"-->
+        <!--            android:background="@drawable/loading"-->
+        <!--            android:stateListAnimator="@null"-->
+        <!--            android:visibility="invisible" />-->
+
+    </RelativeLayout>
+
+    <!--    <RelativeLayout-->
+    <!--        android:id="@+id/timetableTop"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:background="@drawable/navibar_r"-->
+    <!--        android:visibility="invisible" />-->
+
+
+    <!--    <RelativeLayout-->
+    <!--        android:id="@+id/backgroundForTT_B"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:layout_below="@+id/timetableTop"-->
+    <!--        android:background="@color/colorPrimaryDark"-->
+    <!--        android:visibility="invisible">-->
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/loadingImgForTT"-->
+    <!--            android:layout_width="89dp"-->
+    <!--    android:layout_height="10dp"-->
+    <!--            android:layout_centerInParent="true"-->
+    <!--            android:stateListAnimator="@null"-->
+    <!--            android:layout_centerVertical="true"-->
+    <!--            android:background="@drawable/loading"-->
+    <!--            android:visibility="invisible" />-->
+
+    <!--    </RelativeLayout>-->
+
+</RelativeLayout>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/busStopListContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/busInfo1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/arrivedInfo"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/busStopNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nanum_square_b"
+            android:text="버스정류장번호"
+            android:textColor="@color/gray_info"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/busStopNameAndNextStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="버스정류장이름 (버스정류장방향)"
+            android:textColor="@color/gray_info"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+<!--    <LinearLayout-->
+<!--        android:id="@+id/busNumberInfo"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="15dp"-->
+<!--        android:background="@drawable/rounded_corner_blue_fill"-->
+<!--        android:layout_marginLeft="30dp"-->
+<!--        >-->
+
+        <TextView
+            android:id="@+id/busNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nanum_square_b"
+            android:text="버스번호"
+            android:layout_marginTop="15dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:background="@drawable/rounded_corner_blue_fill"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/white"
+            android:textSize="28sp" />
+
+<!--        <TextView-->
+<!--            android:id="@+id/busNumberTxt"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@id/busInfo1"-->
+<!--            android:layout_centerHorizontal="true"-->
+<!--            android:layout_marginLeft="1dp"-->
+<!--            android:layout_toRightOf="@id/busNumber"-->
+<!--            android:fontFamily="@font/nanum_square_b"-->
+<!--            android:text=" 번"-->
+<!--            android:textColor="@color/purple"-->
+<!--            android:textSize="26sp" />-->
+<!--    </LinearLayout>-->
+
+    <ImageView
+        android:id="@+id/busIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/busNumber"
+        android:layout_marginTop="13dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/icn_bus_" />
+
+    <TextView
+        android:id="@+id/arrivedInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/busNumber"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/busIcon"
+        android:layout_marginTop="15dp"
+        android:fontFamily="@font/nanum_square_b"
+        android:gravity="center"
+        android:text="24"
+        android:textAlignment="center"
+        android:textColor="@color/green"
+        android:textSize="22sp" />
+
+<!--    <TextView-->
+<!--        android:id="@+id/arrivedInfoTxt"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/busNumberInfo"-->
+<!--        android:layout_alignTop="@+id/arrivedInfo"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_marginRight="10dp"-->
+<!--        android:layout_marginBottom="15dp"-->
+<!--        android:layout_toRightOf="@+id/arrivedInfo"-->
+<!--        android:text="번째 전"-->
+<!--        android:textColor="@color/purple"-->
+<!--        android:textSize="24sp" />-->
+
+    <ImageView
+        android:id="@+id/nextImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/btn_view_" />
+
+    <TextView
+        android:id="@+id/noBusTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/busNumber"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="25dp"
+        android:gravity="center"
+        android:text="도착정보 없음"
+        android:textColor="@color/gray"
+        android:textSize="22sp"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/arrivedSoon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/busNumber"
+        android:layout_marginLeft="30dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/arrivedSoonTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="25dp"
+            android:gravity="center"
+            android:layout_toRightOf="@+id/busIcon2"
+            android:text="잠시 후 도착"
+            android:textColor="@color/gray_arrivedSoon"
+            android:textSize="22sp" />
+
+        <ImageView
+            android:id="@+id/busIcon2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/icn_bus_" />
+    </RelativeLayout>
+
+</RelativeLayout>

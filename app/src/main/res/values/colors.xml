@@ -12,12 +12,17 @@
     <color name="white50">#80ffffff</color>
     <color name="white80">#CCffffff</color>
     <color name="darkGray">#707070</color>
-    <color name="gray">#CCCCCC</color>
+    <color name="gray">#999999</color>
     <color name="lightGray">#D7D7D7</color>
     <color name="green">#4ABC96</color>
     <color name="lightGreen">#98E4E4</color>
-    <color name="purple">#BB8AF6</color>
+    <color name="purple">#9569FE</color>
     <color name="lightPurple">#A5A4B8</color>
-    <color name="yellow">#fbe876</color>
+    <color name="blue">#43CFEC</color>
+    <color name="yellow">#FECF38</color>
     <color name="lightYellow">#FDF3E0</color>
+    <color name="gray_info">#989898</color>
+    <color name="gray_arrivedSoon">#333333</color>
+    <color name="timeline_line_color">#DDDDDD</color>
+    <color name="timeline_line_marker_color">#0086878a</color>
 </resources>
