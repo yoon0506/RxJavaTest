@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+    buildFeatures.dataBinding true
+
+    defaultConfig {
+        applicationId "com.yoon.rxjavatest"
+        minSdkVersion 23
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    // for timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+    // Lifecycle components
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
+    // for gif
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+//    // rx java
+//    implementation 'io.reactivex.rxjava2.rxandroid:2.1.1'
+//    // rx lifecycle
+//    implementation 'com.trello.rxlifecycle2:rxlifecycle-android:2.1.0'
+    // rx java
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.7'
+    // 안드로이드에서 editText와 같은 뷰 컴포넌트들을 손쉽게 Observable형태로 만들어준다.
+    implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
+}

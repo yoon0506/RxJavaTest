@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+
+    <item android:drawable="@drawable/frog" android:duration="500"/>
+    <item android:drawable="@drawable/frog_hands_up" android:duration="500"/>
+    <item android:drawable="@drawable/frog" android:duration="500"/>
+    <item android:drawable="@drawable/frog_hands_up" android:duration="500"/>
+<!--    <item android:drawable="@drawable/apply5" android:duration="50"/>-->
+<!--    <item android:drawable="@drawable/apply6" android:duration="50"/>-->
+<!--    <item android:drawable="@drawable/apply7" android:duration="50"/>-->
+<!--    <item android:drawable="@drawable/apply8" android:duration="50"/>-->
+<!--    <item android:drawable="@drawable/apply9" android:duration="50"/>-->
+
+</animation-list>
