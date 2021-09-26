@@ -10,19 +10,25 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.yoon.rxjavatest._Library._Popup;
 import com.yoon.rxjavatest._Library._Yoon._Internet;
+import com.yoon.rxjavatest.busData.BusStop;
+import com.yoon.rxjavatest.busData.SaveManagerBusList;
 import com.yoon.rxjavatest.databinding.ActivityLandingBinding;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -37,10 +43,22 @@ public class ActivityLanding extends AppCompatActivity {
 
     private Disposable mDisposable;
 
-    private final int TYPE_CONNECTED = 1;
-    private final int TYPE_NOT_CONNECTED = 2;
-
     protected boolean mSetSetting = false;
+    private ArrayList<HashMap<String, String>> mBusStationInfo = new ArrayList<HashMap<String, String>>();
+
+    // 버스 타임라인에서 선택한 정류장의 데이터
+    private BusStop mBusStopData;
+    private ArrayList<BusStop> mBusStopList = new ArrayList<>();
+    // 선택된 버스 정류소 정보
+    protected String mBusRouteNum = null;
+    protected String mBusNodeNum = null;
+    protected String mBusRouteId = null;
+    protected String mBusNodeName = null;
+    protected String mBusNodeId = null;
+    protected String mBusRouteTp = null;
+    protected String mBusStartStopName = null;
+    protected String mBusEndStopName = null;
+    protected String mBusNextBusStop = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +70,16 @@ public class ActivityLanding extends AppCompatActivity {
             @Override
             public void result(int result) {
                 if (result == _Internet.GetInstance().TYPE_CONNECTED) { //인터넷 연결 o
-                        //퍼미션 상태 확인
-                        if (!hasPermissions(PERMISSIONS)) {
-                            //퍼미션 허가 안되어있다면 사용자에게 요청
-                            requestPermissions(PERMISSIONS, PERMISSIONS_REQUEST_CODE);
-                        } else {
-                            startAnim();
-                        }
+                    //퍼미션 상태 확인
+                    if (!hasPermissions(PERMISSIONS)) {
+                        //퍼미션 허가 안되어있다면 사용자에게 요청
+                        requestPermissions(PERMISSIONS, PERMISSIONS_REQUEST_CODE);
+                    } else {
+                        startAnim();
+                        // 정류장 구현 후 설정할것
+                        // 저장된 데이터 불러옴
+//                        loadSavedData();
+                    }
                 } else {  // 인터넷 연결 x
                     _Popup.GetInstance().ShowConfirmPopup(This, Define.NOTIFY_TITLE, Define.NETWORK_INFORM, Define.CONFIRM_MSG, new _Popup.ConfirmPopupListener() {
                         @Override
@@ -81,7 +102,7 @@ public class ActivityLanding extends AppCompatActivity {
         }
     }
 
-    private void startAnim(){
+    private void startAnim() {
         final AnimationDrawable mmAnimation = (AnimationDrawable) mBinding.frogImage.getBackground();
         mBinding.frogImage.post(() -> mmAnimation.start());
 
@@ -139,37 +160,61 @@ public class ActivityLanding extends AppCompatActivity {
                     boolean accessCoarseLocation = grantResults[2]
                             == PackageManager.PERMISSION_GRANTED;
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        if (!notify || !accessFineLocation || !accessCoarseLocation) {
-                            _Popup.GetInstance().ShowConfirmPopup(This, Define.NOTIFY_TITLE, Define.PERMISSION_DENIED_INFORM, Define.CONFIRM_MSG, new _Popup.ConfirmPopupListener() {
-                                @Override
-                                public void didSelectConfirmPopup(String title, String message, String confirmMessage) {
-                                    if (confirmMessage.equals(Define.CONFIRM_MSG)) {
-                                        finish();
-                                    }
+                    if (!notify || !accessFineLocation || !accessCoarseLocation) {
+                        _Popup.GetInstance().ShowConfirmPopup(This, Define.NOTIFY_TITLE, Define.PERMISSION_DENIED_INFORM, Define.CONFIRM_MSG, new _Popup.ConfirmPopupListener() {
+                            @Override
+                            public void didSelectConfirmPopup(String title, String message, String confirmMessage) {
+                                if (confirmMessage.equals(Define.CONFIRM_MSG)) {
+                                    finish();
                                 }
-                            });
-                        } else {
-                            startAnim();
-                        }
+                            }
+                        });
                     } else {
-                        if (!notify || !accessFineLocation || !accessCoarseLocation) {
-                            _Popup.GetInstance().ShowConfirmPopup(This, Define.NOTIFY_TITLE, Define.PERMISSION_DENIED_INFORM, Define.CONFIRM_MSG, new _Popup.ConfirmPopupListener() {
-                                @Override
-                                public void didSelectConfirmPopup(String title, String message, String confirmMessage) {
-                                    if (confirmMessage.equals(Define.CONFIRM_MSG)) {
-                                        finish();
-                                    }
-                                }
-                            });
-                        } else {
-                            startAnim();
-                        }
+                        startAnim();
+                        // 저장된 데이터 불러옴
+//                        loadSavedData();
                     }
                 }
                 break;
         }
     }
+
+
+    private int mCntData = 0;
+    // 사용자가 저장한 버스 정류장의 개수
+    private int mTotalCnt = 0;
+
+    private void loadSavedData() {
+//        SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(This);
+//        String savedData = mPref.getString("busDataList", "");
+//        if (savedData == null || savedData.equals("") || savedData.equals("{}")) {
+//            loadSavedNotiBusData();
+//        } else {
+//            SaveManagerBusList.GetInstance().setListener(new SaveManagerBusList.Listener() {
+//                @Override
+//                public void didRespond(String event, ArrayList<BusStop> data) {
+//                    if (event.equals(Define.LOAD_DATA) && data != null) {
+//                        AppData.GetInstance().SetBusStopList(data);
+//                        mTotalCnt = data.size();
+//                        if (mCntData < mTotalCnt) {
+//                            mBusRouteNum = data.get(mCntData).getBusNum();
+//                            mBusNodeNum = data.get(mCntData).getBusStopNumber();
+//                            mBusRouteId = data.get(mCntData).getRouteId();
+//                            mBusNodeName = data.get(mCntData).getBusStopName();
+//                            mBusNodeId = data.get(mCntData).getNodeId();
+//                            mBusRouteTp = data.get(mCntData).getRoutetp();
+//                            mBusStartStopName = data.get(mCntData).getFinalStartBusStop();
+//                            mBusEndStopName = data.get(mCntData).getFinalEndBusStop();
+//                            mBusNextBusStop = data.get(mCntData).getNextBusStop();
+//                            requestBusRouteInfo();
+//                        }
+//                    }
+//                }
+//            });
+//            SaveManagerBusList.GetInstance().loadData(savedData);
+//        }
+    }
+
 
     @Override
     protected void onResume() {
