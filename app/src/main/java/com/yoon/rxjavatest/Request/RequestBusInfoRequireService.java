@@ -1,13 +1,8 @@
 package com.yoon.rxjavatest.Request;
 
 import com.yoon.rxjavatest.Key;
-import com.yoon.rxjavatest._Library.HttpUtil;
+import com.yoon.rxjavatest.Example;
 
-import org.json.JSONObject;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -18,35 +13,20 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public class RequestRxRouteAcctoBusList {
+public class RequestBusInfoRequireService {
 
-    private RequestRouteAcctoBusList.Listener mListener = null;
-    public void setListener(RequestRouteAcctoBusList.Listener listener) {
-        mListener = listener;
-    }
-    public void request(String routeId, RequestRouteAcctoBusList.Listener listener) {
-        setListener(listener);
-
-        String mmUrl = Key.GET_ROUTE_ARVL_BUS_LIST + Key.SERVICE_KEY + "&cityCode=" + "32010" + "&routeId=" + routeId + "&_type=json";
-
-
-//        requestJsonData(mmUrl);
-    }
-
-    public RouteAcctoBus getBusAPI(){
+    public RequestBusInfoRequireService.RouteAcctoBus getBusAPI(){
         Retrofit mmRetrofit = new Retrofit.Builder()
                 .baseUrl(Key.BASE_URI)
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        return mmRetrofit.create(RouteAcctoBus.class);
+        return mmRetrofit.create(RequestBusInfoRequireService.RouteAcctoBus.class);
     }
 
-    public RouteAcctoBus getServiceAPI(){
+    public RequestBusInfoRequireService.RouteAcctoBus getServiceAPI(){
 
         HttpLoggingInterceptor mmLogInterceptor = new HttpLoggingInterceptor();
         mmLogInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -62,35 +42,35 @@ public class RequestRxRouteAcctoBusList {
                 .baseUrl(Key.BASE_URI)
                 .build();
 
-        return mmRetrofit.create(RouteAcctoBus.class);
+        return mmRetrofit.create(RequestBusInfoRequireService.RouteAcctoBus.class);
     }
 
-    private RequestRxRouteAcctoBusList(){
+    private RequestBusInfoRequireService(){
 
     }
 
     private static class Singleton{
-        private static final RequestRxRouteAcctoBusList mInstance = new RequestRxRouteAcctoBusList();
+        private static final RequestBusInfoRequireService mInstance = new RequestBusInfoRequireService();
     }
 
-    public static RequestRxRouteAcctoBusList getInstance(){
-        return Singleton.mInstance;
+    public static RequestBusInfoRequireService getInstance(){
+        return RequestBusInfoRequireService.Singleton.mInstance;
     }
 
     public interface RouteAcctoBus{
-        @GET("BusLcInfoInqireService/getRouteAcctoBusLcList?")
-        Call<List<String>> getCallBus(
+        @GET("BusRouteInfoInqireService/getRouteNoList?")
+        Call<Example> getCallBus(
                 @Query(value = "serviceKey", encoded = true) String serviceKey,
                 @Query(value = "cityCode", encoded = true) String cityCode,
-                @Query(value = "routeNo", encoded = true) String routeNo,
+                @Query(value = "routeId", encoded = true) String routeId,
                 @Query("_type") String json
         );
 
-        @GET("BusLcInfoInqireService/getRouteAcctoBusLcList?")
-        Observable<List<String>> getObBus(
+        @GET("BusRouteInfoInqireService/getRouteNoList?")
+        Observable<Example> getObBus(
                 @Query(value = "serviceKey", encoded = true) String serviceKey,
                 @Query(value = "cityCode", encoded = true) String cityCode,
-                @Query(value = "routeNo", encoded = true) String routeNo,
+                @Query(value = "routeId", encoded = true) String routeId,
                 @Query("_type") String json
         );
     }

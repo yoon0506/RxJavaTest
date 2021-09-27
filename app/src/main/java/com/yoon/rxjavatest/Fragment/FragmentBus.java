@@ -18,13 +18,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.trello.rxlifecycle2.components.RxFragment;
 import com.yoon.rxjavatest.Adapter.AdapterBusList;
 import com.yoon.rxjavatest.AppData;
 import com.yoon.rxjavatest.Define;
 import com.yoon.rxjavatest.Key;
 import com.yoon.rxjavatest.R;
+import com.yoon.rxjavatest.Request.RequestBusInfoRequireService;
 import com.yoon.rxjavatest.Request.RequestRouteAcctoBusList;
+import com.yoon.rxjavatest.Request.RequestRxRouteAcctoBusList;
+import com.yoon.rxjavatest.Example;
 import com.yoon.rxjavatest.busData.BusStop;
 import com.yoon.rxjavatest.busData.BusTimeLine;
 import com.yoon.rxjavatest.busData.SaveManagerBusList;
@@ -32,11 +34,14 @@ import com.yoon.rxjavatest.databinding.FragmentBusBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import timber.log.Timber;
 
 
@@ -52,6 +57,7 @@ public class FragmentBus extends Fragment {
 
     // request
     private RequestRouteAcctoBusList mRequestRouteAcctoBusList;
+    private RequestRxRouteAcctoBusList mRequestRxRouteAcctoBusList;
 
     private View mFooterView;
     private AdapterBusList mAdapterBusList;
@@ -75,8 +81,10 @@ public class FragmentBus extends Fragment {
 
     // rxJava
     private Disposable mDisposable;
+    private CompositeDisposable mCompositeDisposable;
 
     private Listener mListener = null;
+
     public void setListener(Listener listener) {
         mListener = listener;
     }
@@ -107,15 +115,17 @@ public class FragmentBus extends Fragment {
 
             mFirstVisiblePosition = 0;
 
+            requestBusInfoRequireService();
+
             // 서버로부터 도착 정보 받아옴
             mDataTotalCnt = AppData.GetInstance().mBusStopList.size();
 
             if (mDataCnt < mDataTotalCnt) {
                 ArrayList<BusStop> mmTempData = AppData.GetInstance().mBusStopList;
 
-                    mNodeId = mmTempData.get(mDataCnt).getNodeId();
-                    mRouteId = mmTempData.get(mDataCnt).getRouteId();
-                    mNodeOrd = mmTempData.get(mDataCnt).getNodeOrd();
+                mNodeId = mmTempData.get(mDataCnt).getNodeId();
+                mRouteId = mmTempData.get(mDataCnt).getRouteId();
+                mNodeOrd = mmTempData.get(mDataCnt).getNodeOrd();
                 requestRouteAcctoBusList();
                 if (mListener != null) {
                     mListener.didRespond(This, Define.LOADING, null);
@@ -131,7 +141,8 @@ public class FragmentBus extends Fragment {
             e.printStackTrace();
         }
     }
-//
+
+    //
     private void showFragmentMap() {
         Timber.tag("checkCheck").d("map map map map map map ");
 
@@ -337,9 +348,9 @@ public class FragmentBus extends Fragment {
                 mDataCnt++;
                 if (mDataTotalCnt > mDataCnt) {
                     ArrayList<BusStop> mmTempData = AppData.GetInstance().mBusStopList;
-                        mNodeId = mmTempData.get(mDataCnt).getNodeId();
-                        mRouteId = mmTempData.get(mDataCnt).getRouteId();
-                        mNodeOrd = mmTempData.get(mDataCnt).getNodeOrd();
+                    mNodeId = mmTempData.get(mDataCnt).getNodeId();
+                    mRouteId = mmTempData.get(mDataCnt).getRouteId();
+                    mNodeOrd = mmTempData.get(mDataCnt).getNodeOrd();
                     requestRouteAcctoBusList();
                 } else {
                     mDataCnt = 0;
@@ -349,7 +360,45 @@ public class FragmentBus extends Fragment {
             }
         });
     }
-//
+
+    private void requestBusInfoRequireService() {
+        startRx();
+    }
+
+    private void startRx() {
+        mRouteId = "CCB250020001";
+        RequestBusInfoRequireService.RouteAcctoBus mmService = RequestBusInfoRequireService.getInstance().getServiceAPI();
+        Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE, mRouteId, Key.TYPE_JSON);
+
+        mCompositeDisposable = new CompositeDisposable();
+        mCompositeDisposable.add(
+                mmObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new io.reactivex.rxjava3.observers.DisposableObserver<Example>() {
+                                           @Override
+                                           public void onNext(@io.reactivex.rxjava3.annotations.NonNull Example strings) {
+//                                               for (Example data : strings) {
+//                                                   Timber.tag("checkCheck").d("data : %s", data.toString());
+//                                               }
+                                               Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
+                                           }
+
+                                           @Override
+                                           public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                                               Timber.tag("checkCheck").d("e : %s", e);
+                                           }
+
+                                           @Override
+                                           public void onComplete() {
+
+                                           }
+
+                                       }
+                        ));
+    }
+
+
+    //
 //    private void requestArrivalPushInfo(HashMap<String, String> busData) {
 //        String mmUserId = AppData.GetInstance().GetUserID(getContext());
 //        String mmNotiId = "arrival";
@@ -538,6 +587,7 @@ public class FragmentBus extends Fragment {
                             mFirstVisiblePosition = view.getFirstVisiblePosition();
                         }
                     }
+
                     @Override
                     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                         if (mBinding.timeLineListView.getChildCount() > 0) {
@@ -560,7 +610,8 @@ public class FragmentBus extends Fragment {
             }
         }
     }
-//
+
+    //
 //    private void showFragmentLoading() {
 //        if (mFragmentLoading != null) {
 //            removeFragment(mFragmentLoading);
@@ -684,7 +735,7 @@ public class FragmentBus extends Fragment {
     }
 
     private Observable<View> getObservable() {
-        return Observable.create(e ->  mBinding.addBusBtn.setOnClickListener(e::onNext));
+        return Observable.create(e -> mBinding.addBusBtn.setOnClickListener(e::onNext));
     }
 
     public void removeFragment(Fragment fragment) {
