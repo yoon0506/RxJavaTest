@@ -1,13 +1,7 @@
 package com.yoon.rxjavatest.Request;
 
 import com.yoon.rxjavatest.Key;
-import com.yoon.rxjavatest._Library.HttpUtil;
 
-import org.json.JSONObject;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -15,11 +9,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public class RequestRxRouteAcctoBusList {
@@ -40,7 +32,7 @@ public class RequestRxRouteAcctoBusList {
     public RouteAcctoBus getBusAPI(){
         Retrofit mmRetrofit = new Retrofit.Builder()
                 .baseUrl(Key.BASE_URI)
-                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         return mmRetrofit.create(RouteAcctoBus.class);
@@ -56,7 +48,7 @@ public class RequestRxRouteAcctoBusList {
                 .build();
 
         Retrofit mmRetrofit = new Retrofit.Builder()
-                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(mmClient)
                 .baseUrl(Key.BASE_URI)

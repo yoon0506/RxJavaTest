@@ -1,4 +1,4 @@
-package com.yoon.rxjavatest;
+package com.yoon.rxjavatest.Api;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

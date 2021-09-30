@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.provider.Settings;
 //
 //import busData.BusSelection;
 //import busData.BusStop;
@@ -17,12 +16,9 @@ import com.yoon.rxjavatest.busData.BusStop;
 import com.yoon.rxjavatest.busData.BusStopFromCSV;
 import com.yoon.rxjavatest.busData.BusTimeLine;
 
-import org.json.JSONObject;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 public class AppData {
 

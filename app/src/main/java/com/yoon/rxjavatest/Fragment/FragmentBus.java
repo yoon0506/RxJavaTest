@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.yoon.rxjavatest.Adapter.AdapterBusList;
+import com.yoon.rxjavatest.Api.Example;
 import com.yoon.rxjavatest.AppData;
 import com.yoon.rxjavatest.Define;
 import com.yoon.rxjavatest.Key;
@@ -26,7 +27,6 @@ import com.yoon.rxjavatest.R;
 import com.yoon.rxjavatest.Request.RequestBusInfoRequireService;
 import com.yoon.rxjavatest.Request.RequestRouteAcctoBusList;
 import com.yoon.rxjavatest.Request.RequestRxRouteAcctoBusList;
-import com.yoon.rxjavatest.Example;
 import com.yoon.rxjavatest.busData.BusStop;
 import com.yoon.rxjavatest.busData.BusTimeLine;
 import com.yoon.rxjavatest.busData.SaveManagerBusList;
@@ -34,14 +34,14 @@ import com.yoon.rxjavatest.databinding.FragmentBusBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 
@@ -374,9 +374,9 @@ public class FragmentBus extends Fragment {
         mCompositeDisposable.add(
                 mmObservable.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new io.reactivex.rxjava3.observers.DisposableObserver<Example>() {
+                        .subscribeWith(new DisposableObserver<Example>() {
                                            @Override
-                                           public void onNext(@io.reactivex.rxjava3.annotations.NonNull Example strings) {
+                                           public void onNext(@NonNull Example strings) {
 //                                               for (Example data : strings) {
 //                                                   Timber.tag("checkCheck").d("data : %s", data.toString());
 //                                               }
@@ -384,7 +384,7 @@ public class FragmentBus extends Fragment {
                                            }
 
                                            @Override
-                                           public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                                           public void onError(@NonNull Throwable e) {
                                                Timber.tag("checkCheck").d("e : %s", e);
                                            }
 

@@ -10,30 +10,23 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.yoon.rxjavatest._Library._Popup;
 import com.yoon.rxjavatest._Library._Yoon._Internet;
 import com.yoon.rxjavatest.busData.BusStop;
-import com.yoon.rxjavatest.busData.SaveManagerBusList;
 import com.yoon.rxjavatest.databinding.ActivityLandingBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 public class ActivityLanding extends AppCompatActivity {
