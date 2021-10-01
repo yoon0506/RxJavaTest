@@ -15,18 +15,31 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
 
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.yoon.rxjavatest._Library._Popup;
 import com.yoon.rxjavatest._Library._Yoon._Internet;
 import com.yoon.rxjavatest.busData.BusStop;
+import com.yoon.rxjavatest.busData.BusStopFromCSV;
 import com.yoon.rxjavatest.databinding.ActivityLandingBinding;
 
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Timed;
 import timber.log.Timber;
 
 public class ActivityLanding extends AppCompatActivity {
@@ -39,6 +52,8 @@ public class ActivityLanding extends AppCompatActivity {
     protected boolean mSetSetting = false;
     private ArrayList<HashMap<String, String>> mBusStationInfo = new ArrayList<HashMap<String, String>>();
 
+    private String mBusStopInfoFileName = "bus_stop_info.csv";
+    
     // 버스 타임라인에서 선택한 정류장의 데이터
     private BusStop mBusStopData;
     private ArrayList<BusStop> mBusStopList = new ArrayList<>();
@@ -68,7 +83,7 @@ public class ActivityLanding extends AppCompatActivity {
                         //퍼미션 허가 안되어있다면 사용자에게 요청
                         requestPermissions(PERMISSIONS, PERMISSIONS_REQUEST_CODE);
                     } else {
-                        startAnim();
+                        getBusStationInfoFromCSV();
                         // 정류장 구현 후 설정할것
                         // 저장된 데이터 불러옴
 //                        loadSavedData();
@@ -95,9 +110,44 @@ public class ActivityLanding extends AppCompatActivity {
         }
     }
 
+    private void getBusStationInfoFromCSV(){
+        mBusStationInfo = new ArrayList<>();
+        try {
+            InputStream is = getAssets().open(mBusStopInfoFileName);
+            InputStreamReader isr = new InputStreamReader(is, "EUC-KR");
+            BufferedReader br = new BufferedReader(isr);
+            CSVReader reader = new CSVReaderBuilder(br)
+                    .withCSVParser(new CSVParserBuilder().withSeparator(',').build()).build();
+            List<String[]> nextLine = reader.readAll();
+            
+            for (String[] str : nextLine){
+                String mmNodeId = str[0];
+                String mmNodeNum = str[3];
+                String mmBusStopName = str[4];
+//                String mmNextBusStopName = str[5];
+                String mmLati = str[6];
+                String mmLongi = str[5];
+                HashMap<String, String> mmData = new HashMap<>();
+                mmData.put(Key.BUS_NODE_ID, mmNodeId);
+                mmData.put(Key.BUS_NODE_NO, mmNodeNum);
+                mmData.put(Key.BUS_NODE_NAME, mmBusStopName);
+//                mmData.put(Key.BUS_NEXT_STOP, mmNextBusStopName);
+                mmData.put(Key.BUS_LATITUDE, mmLati);
+                mmData.put(Key.BUS_LONGITUDE, mmLongi);
+                BusStopFromCSV mmCsvBusStopData = new BusStopFromCSV(mmData);
+                AppData.GetInstance().mCSVBusStopList.add(mmCsvBusStopData);
+            }
+
+            startAnim();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void startAnim() {
         final AnimationDrawable mmAnimation = (AnimationDrawable) mBinding.frogImage.getBackground();
-        mBinding.frogImage.post(() -> mmAnimation.start());
+        mBinding.frogImage.post(mmAnimation::start);
 
         // 중복 실행 방지
         mDisposable = getObservable().throttleFirst(2000, TimeUnit.MILLISECONDS)
@@ -163,7 +213,7 @@ public class ActivityLanding extends AppCompatActivity {
                             }
                         });
                     } else {
-                        startAnim();
+                        getBusStationInfoFromCSV();
                         // 저장된 데이터 불러옴
 //                        loadSavedData();
                     }

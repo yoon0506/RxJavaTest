@@ -328,19 +328,18 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
     // ### csv 데이터에서 마커 뿌리는부분
     private void addMarkers() {
 
-        ArrayList<String> mShowData = new ArrayList<>();
+        ArrayList<String> mmShowData = new ArrayList<>();
+        ArrayList<BusStopFromCSV> mmCSVBusStopList = new ArrayList<>(AppData.GetInstance().mCSVBusStopList);
         // csv에서 받은 데이터 뿌리는 부분
         if (AppData.GetInstance().mCSVBusStopList.size() > 0) {
             // 받은 데이터에서 일정 범위 이내의 데이터만 선별
-            for (int i = 0; i < AppData.GetInstance().mCSVBusStopList.size(); i++) {
-                ArrayList<BusStopFromCSV> mBusData = AppData.GetInstance().mCSVBusStopList;
-
-                double mmLat = mBusData.get(i).getLatitude();
-                double mmLong = mBusData.get(i).getLongitude();
+            for(BusStopFromCSV busData : mmCSVBusStopList){
+                double mmLat = busData.getLatitude();
+                double mmLong = busData.getLongitude();
                 double mmDistance = meters(mLatitude, mLongitude, mmLat, mmLong);
 
                 if (mmDistance < 500) {
-                    mShowData.add(i + "");
+                    mmShowData.add(busData.getBusNodeNum());
                 }
             }
 
@@ -356,37 +355,32 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
             }
 
             // 받은 데이터만큼 마커 추가.
-            for (int i = 0; i < AppData.GetInstance().mCSVBusStopList.size(); i++) {
-                ArrayList<BusStopFromCSV> mBusData = AppData.GetInstance().mCSVBusStopList;
-
-                mMarker = new Marker[mShowData.size()];
-
-
-                for (int j = 0; j < mShowData.size(); j++) {
-
-                    if (i == Integer.parseInt(mShowData.get(j))) {
-                        int index = Integer.parseInt(mShowData.get(j));
-                        double mmLat = mBusData.get(index).getLatitude() - 0.00004;
-                        double mmLong = mBusData.get(index).getLongitude() + 0.00004;
-                        String mmBusNodeId = mBusData.get(index).getBusNodeId();
-                        String mmBusNodeName = mBusData.get(index).getBusStopName();
+            int mmDataCnt = -1;
+            for(BusStopFromCSV busData : mmCSVBusStopList){
+                mMarker = new Marker[mmShowData.size()];
+                for(String showData : mmShowData){
+                    if (busData.getBusNodeNum().equals(showData)) {
+                        mmDataCnt++;
+                        double mmLat = busData.getLatitude() - 0.00004;
+                        double mmLong = busData.getLongitude() + 0.00004;
+                        String mmBusNodeId = busData.getBusNodeId();
+                        String mmBusNodeName = busData.getBusStopName();
 
                         // 마커
-                        mMarker[j] = new Marker();
-                        mMarker[j].setIconPerspectiveEnabled(true);
-                        mMarker[j].setPosition(new LatLng(mmLat, mmLong));
-                        mMarker[j].setIcon(OverlayImage.fromResource(R.drawable.marker_station));
-                        mMarker[j].setMap(mNaverMap);
-                        mMarker[j].setTag(mmBusNodeId + "//" + mmBusNodeName);
-                        mMarker[j].setOnClickListener(overlay -> {
-                            for (int k = 0; k < AppData.GetInstance().mCSVBusStopList.size(); k++) {
-//                            for (int i = 0; i < AppData.GetInstance().mCSVBusStopListHashmap.size(); i++) {
-                                Double mmLatitude = Double.parseDouble(AppData.GetInstance().mCSVBusStopList.get(k).getLatitude() + "");
-                                Double mmLongitude = Double.parseDouble(AppData.GetInstance().mCSVBusStopList.get(k).getLongitude() + "");
+                        mMarker[mmDataCnt] = new Marker();
+                        mMarker[mmDataCnt].setIconPerspectiveEnabled(true);
+                        mMarker[mmDataCnt].setPosition(new LatLng(mmLat, mmLong));
+                        mMarker[mmDataCnt].setIcon(OverlayImage.fromResource(R.drawable.marker_station));
+                        mMarker[mmDataCnt].setMap(mNaverMap);
+                        mMarker[mmDataCnt].setTag(mmBusNodeId + "//" + mmBusNodeName);
+                        mMarker[mmDataCnt].setOnClickListener(overlay -> {
+                                for(BusStopFromCSV busStopList : mmCSVBusStopList){
+                                Double mmLatitude = Double.parseDouble(busStopList.getLatitude() + "");
+                                Double mmLongitude = Double.parseDouble(busStopList.getLongitude() + "");
                                 mLatLng = new LatLng(mmLatitude, mmLongitude);
-                                String mmTempBusNodeId = AppData.GetInstance().mCSVBusStopList.get(k).getBusNodeId();
+                                String mmTempBusNodeId = busStopList.getBusNodeId();
                                 if (overlay.getTag().toString().contains(mmTempBusNodeId)) {
-                                    mSelectedBusData = AppData.GetInstance().mCSVBusStopList.get(k);
+                                    mSelectedBusData = busStopList;
                                     if (mSelectedMarker != null) {
                                         mSelectedMarker.setMap(null);
                                     }
@@ -404,7 +398,7 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
                             }
                             return true;
                         });
-                        mMarkerArrayList.add(j, mMarker[j]);
+                        mMarkerArrayList.add(mmDataCnt, mMarker[mmDataCnt]);
                     }
                 }
             }

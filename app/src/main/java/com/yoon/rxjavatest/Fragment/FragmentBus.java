@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.yoon.rxjavatest.Adapter.AdapterBusList;
 import com.yoon.rxjavatest.Api.Example;
+import com.yoon.rxjavatest.Api.Item;
 import com.yoon.rxjavatest.AppData;
 import com.yoon.rxjavatest.Define;
 import com.yoon.rxjavatest.Key;
@@ -34,6 +35,7 @@ import com.yoon.rxjavatest.databinding.FragmentBusBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -112,9 +114,9 @@ public class FragmentBus extends Fragment {
                     updateBusList();
                 }
             });
-
             mFirstVisiblePosition = 0;
 
+            //test
             requestBusInfoRequireService();
 
             // 서버로부터 도착 정보 받아옴
@@ -266,99 +268,99 @@ public class FragmentBus extends Fragment {
     }
 
     private void requestRouteAcctoBusList() {
-        mRequestRouteAcctoBusList = new RequestRouteAcctoBusList();
-        mRequestRouteAcctoBusList.request(mRouteId, new RequestRouteAcctoBusList.Listener() {
-            @Override
-            public void didRespond(ArrayList<HashMap<String, String>> data, String error) {
-                if (error.equals("0")) {
-                    if (data.size() > 0) {
-                        if (mNodeId != null) {
-                            ArrayList<Integer> mmTempOrdList = new ArrayList<>();
-                            int mmNodeOrd = Integer.parseInt(mNodeOrd);
-                            for (int i = 0; i < data.size(); i++) {
-                                int mmBusNodeOrd = Integer.parseInt(data.get(i).get(Key.BUS_NODE_ORD));
-                                if (mmNodeOrd - mmBusNodeOrd >= 0) {
-                                    mmTempOrdList.add(mmNodeOrd - mmBusNodeOrd);
-                                }
-                            }
-
-                            // 제일 가까운 정류장 찾기
-                            int mmMinOrd = 1000;
-                            if (mmTempOrdList.size() > 0) {
-                                for (int i = 0; i < mmTempOrdList.size(); i++) {
-                                    int mmTempOrd = mmTempOrdList.get(i);
-                                    if (mmTempOrd <= mmMinOrd) {
-                                        mmMinOrd = mmTempOrd;
-                                    }
-                                }
-                                // 정류장 알림
-//                                if (mmMinOrd >= 0) {
+//        mRequestRouteAcctoBusList = new RequestRouteAcctoBusList();
+//        mRequestRouteAcctoBusList.request(mRouteId, new RequestRouteAcctoBusList.Listener() {
+//            @Override
+//            public void didRespond(ArrayList<HashMap<String, String>> data, String error) {
+//                if (error.equals("0")) {
+//                    if (data.size() > 0) {
+//                        if (mNodeId != null) {
+//                            ArrayList<Integer> mmTempOrdList = new ArrayList<>();
+//                            int mmNodeOrd = Integer.parseInt(mNodeOrd);
+//                            for (int i = 0; i < data.size(); i++) {
+//                                int mmBusNodeOrd = Integer.parseInt(data.get(i).get(Key.BUS_NODE_ORD));
+//                                if (mmNodeOrd - mmBusNodeOrd >= 0) {
+//                                    mmTempOrdList.add(mmNodeOrd - mmBusNodeOrd);
+//                                }
+//                            }
 //
-//                                    AppData.GetInstance().mBusStopList.get(mDataCnt).setArrivedInfo(mmMinOrd + "");
-//
-//                                    if (mmMinOrd == Define.NOTI_BUS_ARRIVAL_CNT) {
-//                                        if (AppData.GetInstance().mNotiBusList.size() > 0) {
-//                                            String mmTempNodeId = AppData.GetInstance().mBusStopList.get(mDataCnt).getNodeId();
-//                                            String mmTempRouteNo = AppData.GetInstance().mBusStopList.get(mDataCnt).getBusNum();
-//                                            for (int i = 0; i < AppData.GetInstance().mNotiBusList.size(); i++) {
-//                                                if (AppData.GetInstance().mNotiBusList.get(i).getNodeId().equals(mmTempNodeId)
-//                                                        && AppData.GetInstance().mNotiBusList.get(i).getBusNum().equals(mmTempRouteNo)) {
-//                                                    Timber.d("main : 푸시 리퀘스트 던질 예정");
-//                                                    HashMap<String, String> mmBusData = new HashMap<>();
-//                                                    mmBusData.put(Key.NOTI_NODE_ID, mmTempNodeId);
-//                                                    mmBusData.put(Key.NOTI_ROUTE_NO, mmTempRouteNo);
-//                                                    mmBusData.put(Key.NOTI_ARRIVAL_COUNT, Define.NOTI_BUS_ARRIVAL_CNT + "");
-//
-//                                                    // 푸시알림 받기 설정을 했을 때, 버스 5번째 전이면 request던짐.
-//                                                    if (AppData.GetInstance().GetPushState(getContext())) {
-//                                                        requestArrivalPushInfo(mmBusData);
-//                                                    }
-//                                                }
-//                                            }
-//
-//                                        }
+//                            // 제일 가까운 정류장 찾기
+//                            int mmMinOrd = 1000;
+//                            if (mmTempOrdList.size() > 0) {
+//                                for (int i = 0; i < mmTempOrdList.size(); i++) {
+//                                    int mmTempOrd = mmTempOrdList.get(i);
+//                                    if (mmTempOrd <= mmMinOrd) {
+//                                        mmMinOrd = mmTempOrd;
 //                                    }
 //                                }
-                            } else {
-                                AppData.GetInstance().mBusStopList.get(mDataCnt).setArrivedInfo("-1");
-                            }
-                        }
-                    }
-                } else if (error.equals("1")) {
-//                    mHandler.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            // 사용하고자 하는 코드
-//                            Timber.d("정상 // 현재 도착하는 데이터 없음.");
+//                                // 정류장 알림
+////                                if (mmMinOrd >= 0) {
+////
+////                                    AppData.GetInstance().mBusStopList.get(mDataCnt).setArrivedInfo(mmMinOrd + "");
+////
+////                                    if (mmMinOrd == Define.NOTI_BUS_ARRIVAL_CNT) {
+////                                        if (AppData.GetInstance().mNotiBusList.size() > 0) {
+////                                            String mmTempNodeId = AppData.GetInstance().mBusStopList.get(mDataCnt).getNodeId();
+////                                            String mmTempRouteNo = AppData.GetInstance().mBusStopList.get(mDataCnt).getBusNum();
+////                                            for (int i = 0; i < AppData.GetInstance().mNotiBusList.size(); i++) {
+////                                                if (AppData.GetInstance().mNotiBusList.get(i).getNodeId().equals(mmTempNodeId)
+////                                                        && AppData.GetInstance().mNotiBusList.get(i).getBusNum().equals(mmTempRouteNo)) {
+////                                                    Timber.d("main : 푸시 리퀘스트 던질 예정");
+////                                                    HashMap<String, String> mmBusData = new HashMap<>();
+////                                                    mmBusData.put(Key.NOTI_NODE_ID, mmTempNodeId);
+////                                                    mmBusData.put(Key.NOTI_ROUTE_NO, mmTempRouteNo);
+////                                                    mmBusData.put(Key.NOTI_ARRIVAL_COUNT, Define.NOTI_BUS_ARRIVAL_CNT + "");
+////
+////                                                    // 푸시알림 받기 설정을 했을 때, 버스 5번째 전이면 request던짐.
+////                                                    if (AppData.GetInstance().GetPushState(getContext())) {
+////                                                        requestArrivalPushInfo(mmBusData);
+////                                                    }
+////                                                }
+////                                            }
+////
+////                                        }
+////                                    }
+////                                }
+//                            } else {
+//                                AppData.GetInstance().mBusStopList.get(mDataCnt).setArrivedInfo("-1");
+//                            }
 //                        }
-//                    }, 0);
-                    AppData.GetInstance().mBusStopList.get(mDataCnt).setArrivedInfo("-1");
-
-                } else if (error.equals("-1")) {
-//                    mHandler.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            // 사용하고자 하는 코드
-//                            Timber.d("통신 오류.");
-//                        }
-//                    }, 0);
-                    AppData.GetInstance().mBusStopList.get(mDataCnt).setArrivedInfo("-1");
-                }
-
-                mDataCnt++;
-                if (mDataTotalCnt > mDataCnt) {
-                    ArrayList<BusStop> mmTempData = AppData.GetInstance().mBusStopList;
-                    mNodeId = mmTempData.get(mDataCnt).getNodeId();
-                    mRouteId = mmTempData.get(mDataCnt).getRouteId();
-                    mNodeOrd = mmTempData.get(mDataCnt).getNodeOrd();
-                    requestRouteAcctoBusList();
-                } else {
-                    mDataCnt = 0;
-                    setAdapter();
-                    mGetDataDone = true;
-                }
-            }
-        });
+//                    }
+//                } else if (error.equals("1")) {
+////                    mHandler.postDelayed(new Runnable() {
+////                        @Override
+////                        public void run() {
+////                            // 사용하고자 하는 코드
+////                            Timber.d("정상 // 현재 도착하는 데이터 없음.");
+////                        }
+////                    }, 0);
+//                    AppData.GetInstance().mBusStopList.get(mDataCnt).setArrivedInfo("-1");
+//
+//                } else if (error.equals("-1")) {
+////                    mHandler.postDelayed(new Runnable() {
+////                        @Override
+////                        public void run() {
+////                            // 사용하고자 하는 코드
+////                            Timber.d("통신 오류.");
+////                        }
+////                    }, 0);
+//                    AppData.GetInstance().mBusStopList.get(mDataCnt).setArrivedInfo("-1");
+//                }
+//
+//                mDataCnt++;
+//                if (mDataTotalCnt > mDataCnt) {
+//                    ArrayList<BusStop> mmTempData = AppData.GetInstance().mBusStopList;
+//                    mNodeId = mmTempData.get(mDataCnt).getNodeId();
+//                    mRouteId = mmTempData.get(mDataCnt).getRouteId();
+//                    mNodeOrd = mmTempData.get(mDataCnt).getNodeOrd();
+//                    requestRouteAcctoBusList();
+//                } else {
+//                    mDataCnt = 0;
+//                    setAdapter();
+//                    mGetDataDone = true;
+//                }
+//            }
+//        });
     }
 
     private void requestBusInfoRequireService() {
@@ -381,6 +383,8 @@ public class FragmentBus extends Fragment {
 //                                                   Timber.tag("checkCheck").d("data : %s", data.toString());
 //                                               }
                                                Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
+                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+
                                            }
 
                                            @Override
@@ -419,53 +423,7 @@ public class FragmentBus extends Fragment {
 //        });
 //
 //    }
-//
-//    private void requestAdBanner() {
-//
-//        String mmUserId = AppData.GetInstance().GetUserID(getContext());
-//
-//        mRequestAdBanner = new RequestAdBanner();
-//        mRequestAdBanner.request(mmUserId, new RequestAdBanner.Listener() {
-//            @Override
-//            public void didRespond(RequestRoot request, HashMap<String, String> properties, String error) {
-//                if (error.equals("0")) {
-//                    String mmTempUserId = properties.get(Key.USER_ID);
-//                    if (mmUserId.equals(mmTempUserId)) {
-//                        String mmMainAdImgURL = properties.get(Key.MAIN_AD_IMG_URL);
-//                        String mmMainAdURL = properties.get(Key.MAIN_AD_URL);
-//                        String mmAdId = properties.get(Key.AD_ID);
-//
-//                        mAdList.put(Key.MAIN_AD_URL, mmMainAdURL);
-//                        mAdList.put(Key.MAIN_AD_IMG_URL, mmMainAdImgURL);
-//                        AppData.GetInstance().SetAdID(getContext(), mmAdId);
-//
-//
-//                        if (mAdList != null) {
-//                            String mmImgUrl = mAdList.get(Key.MAIN_AD_IMG_URL);
-//                            String mmHtmlStr = "<link type=\"text/css\" rel=\"stylesheet\" href=\"https://htmain.kro.kr/cc_portal/css/mobile_RN.css\" />\n"
-//                                    + "<script type=\"text/javascript\">"
-//                                    + "function callWrId(){\n"
-//                                    + "     document.location = 'toapp::click_advrts::';\n"
-//                                    + "}\n"
-//                                    + "</script>"
-//                                    + "<style type='text/css'>"
-//                                    + "img{display: inline;height: auto;max-width: 100%; }</style>"
-//                                    + "<div class='adv' style='position: relative;'>"
-//                                    + "<img src='" + mmImgUrl + "' onclick='javascript:callWrId();' />"
-//                                    + "<span style='position: absolute; top: 10px; left:10px; padding: 3px 10px; ; border-radius: 10px; display: block; color:white; background: rgba(0,0,0,.7); font-size: 1.2rem;'>AD</span></div>";
-//
-//                            mAdList.put(Key.AD_WEB_URL_STRING, mmHtmlStr);
-//                            AppData.GetInstance().SetADInfo(getContext(), mAdList);
-//                        }
-//                    }
-//                } else {
-//                    if (mListener != null)
-//                        mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-//                }
-//            }
-//        });
-//    }
-//
+
     private void saveByPreference(String data) {
         SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = mPref.edit();

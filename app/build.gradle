@@ -81,4 +81,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.squareup.okhttp3:okhttp:3.14.9'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.7'
+
+    //csv reader
+    implementation group: 'com.opencsv', name: 'opencsv', version: '4.6'
 }

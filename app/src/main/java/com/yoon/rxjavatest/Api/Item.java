@@ -88,7 +88,7 @@ public class Item {
 
     @Override
     public String toString() {
-        return "BusData{" +
+        return "{" +
                 "endnodenm='" + endnodenm + '\'' +
                 ", endvehicletime='" + endvehicletime + '\'' +
                 ", routeid='" + routeid + '\'' +
