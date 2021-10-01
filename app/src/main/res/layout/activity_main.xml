@@ -53,7 +53,7 @@
                     android:background="@drawable/empty" />
 
                 <ImageView
-                    android:id="@+id/transportBtn"
+                    android:id="@+id/busStationBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

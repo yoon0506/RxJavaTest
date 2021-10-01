@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.naver.maps.map.NaverMapSdk;
 import com.yoon.rxjavatest.Fragment.FragmentBus;
-import com.yoon.rxjavatest.Fragment.FragmentTransportation;
+import com.yoon.rxjavatest.Fragment.FragmentBusStation;
 import com.yoon.rxjavatest.databinding.ActivityMainBinding;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +32,7 @@ public class ActivityMain extends AppCompatActivity {
     // fragment
     private Fragment mCurrentFragment;
     private FragmentBus mFragmentBus;
-    private FragmentTransportation mFragmentTransportation;
+    private FragmentBusStation mFragmentBusStation;
 
     // rxJava
     private Disposable mDisposable;
@@ -63,17 +63,17 @@ public class ActivityMain extends AppCompatActivity {
 
     private View.OnClickListener mBtnClickEvent = v -> {
         if (mBinding.busBtn.equals(v)) {
-            if(getCurFragmentName().contains(Define.FRAGMENT_BUS)){
+            if(getCurFragmentName().equals(Define.FRAGMENT_BUS)){
                 return;
             }
             Timber.tag("checkCheck").d("fragmentBus.");
             showFragmentBus();
-        } else if (mBinding.transportBtn.equals(v)) {
-            if(getCurFragmentName().contains(Define.FRAGMENT_TRANSPORTATION)){
+        } else if (mBinding.busStationBtn.equals(v)) {
+            if(getCurFragmentName().equals(Define.FRAGMENT_BUS_STATION)){
                 return;
             }
-            Timber.tag("checkCheck").d("fragmentTrans.");
-            showFragmentTransportation();
+            Timber.tag("checkCheck").d("fragmentBusStation.");
+            showFragmentBusStation();
         }
     };
 
@@ -110,16 +110,16 @@ public class ActivityMain extends AppCompatActivity {
     }
 
 
-    private void showFragmentTransportation() {
+    private void showFragmentBusStation() {
         FragmentManager mFragmentManager = getSupportFragmentManager();
         FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransportation = new FragmentTransportation();
-        mFragmentTransportation.setListener((fragment, event, data) -> {
+        mFragmentBusStation = new FragmentBusStation();
+        mFragmentBusStation.setListener((fragment, event, data) -> {
             if (event.equals(Define.LOADING) && data == null) {
 //                    showFragmentLoading(mFragmentTransportation.toString());
-//                    MAIN_EVENT = Define.FRAGMENT_TRANSPORTATION;
-            } else if (event.equals(Define.FRAGMENT_TRANSPORTATION_DETAIL) && data == null) {
-//                    showFragmentTransportationDetail();
+//                    MAIN_EVENT = Define.FRAGMENT_BUS_STATION;
+            } else if (event.equals(Define.FRAGMENT_BUS_STATION_DETAIL) && data == null) {
+//                    showFragmentBusStationDetail();
             } else if (event.equals(Define.LOADING_COMPLETE) && data == null) {
 //                    if (mFragmentLoading != null) {
 //                        if (mLoadingTimer != null) {
@@ -133,9 +133,9 @@ public class ActivityMain extends AppCompatActivity {
 //                    }
             }
         });
-        mFragmentTransaction.replace(R.id.mainFrame, mFragmentTransportation);
+        mFragmentTransaction.replace(R.id.mainFrame, mFragmentBusStation);
         mFragmentTransaction.commitAllowingStateLoss();
-        mCurrentFragment = mFragmentTransportation;
+        mCurrentFragment = mFragmentBusStation;
 
         setBottomResource();
     }
@@ -143,12 +143,12 @@ public class ActivityMain extends AppCompatActivity {
 
     private void setBottomResource() {
         mBinding.busBtn.setBackgroundResource(R.drawable.btn_bus_off);
-        mBinding.transportBtn.setBackgroundResource(R.drawable.btn_transport_off);
+        mBinding.busStationBtn.setBackgroundResource(R.drawable.btn_station_off);
 
-        if (getCurFragmentName().contains(Define.FRAGMENT_BUS)) {
+        if (getCurFragmentName().equals(Define.FRAGMENT_BUS)) {
             mBinding.busBtn.setBackgroundResource(R.drawable.btn_bus_on);
-        } else if (getCurFragmentName().contains(Define.FRAGMENT_TRANSPORTATION)) {
-            mBinding.transportBtn.setBackgroundResource(R.drawable.btn_transport_on);
+        } else if (getCurFragmentName().equals(Define.FRAGMENT_BUS_STATION)) {
+            mBinding.busStationBtn.setBackgroundResource(R.drawable.btn_station_on);
         }
     }
 
@@ -157,14 +157,17 @@ public class ActivityMain extends AppCompatActivity {
         return Observable.create(e ->
         {
             mBinding.busBtn.setOnClickListener(mBtnClickEvent);
-            mBinding.transportBtn.setOnClickListener(mBtnClickEvent);
+            mBinding.busStationBtn.setOnClickListener(mBtnClickEvent);
         });
     }
 
     private String getCurFragmentName() {
         if(mCurrentFragment == null)
             return "";
-        return mCurrentFragment.toString();
+
+        String[] mmTempSplitStr = mCurrentFragment.toString().split("\\{");
+        String mmCurFragmentStr = mmTempSplitStr[0];
+        return mmCurFragmentStr;
     }
 
     private long mBackKeyPressedTime = 0;

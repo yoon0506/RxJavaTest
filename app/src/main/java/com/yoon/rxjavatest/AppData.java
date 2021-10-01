@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 //import busData.BusTimeLine;
 
 import com.yoon.rxjavatest.busData.BusSelection;
+import com.yoon.rxjavatest.busData.BusStation;
 import com.yoon.rxjavatest.busData.BusStop;
 import com.yoon.rxjavatest.busData.BusStopFromCSV;
 import com.yoon.rxjavatest.busData.BusTimeLine;
@@ -197,6 +198,17 @@ public class AppData {
                 mBusSelectionDataList.add(busTimeLineList);
             }
         }
+    }
+
+    // 선택한 정류장 리스트 정보
+    public ArrayList<BusStation> mBusStationList = new ArrayList<>();
+
+    public ArrayList<BusStation> SetBusStationList(ArrayList<BusStation> arrayList) {
+        if (arrayList != null) {
+            mBusStationList = new ArrayList<>();
+            mBusStationList.addAll(arrayList);
+        }
+        return mBusStationList;
     }
 //
 //    // 알림을 받을 버스 리스트 정보

@@ -17,9 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,12 +28,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraUpdate;
 import com.naver.maps.map.MapView;
@@ -44,37 +44,29 @@ import com.naver.maps.map.overlay.OverlayImage;
 import com.naver.maps.map.widget.ZoomControlView;
 import com.yoon.rxjavatest.AppData;
 import com.yoon.rxjavatest.Define;
-import com.yoon.rxjavatest.Key;
 import com.yoon.rxjavatest.R;
-import com.yoon.rxjavatest.Request.RequestBusInformation;
 import com.yoon.rxjavatest._Library._Popup;
-import com.yoon.rxjavatest.busData.BusSelection;
+import com.yoon.rxjavatest.busData.BusStation;
 import com.yoon.rxjavatest.busData.BusStopFromCSV;
-import com.yoon.rxjavatest.databinding.FragmentMapBinding;
+import com.yoon.rxjavatest.databinding.FragmentMapBusStationBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class FragmentMap extends Fragment implements OnMapReadyCallback {
-    private FragmentMap This = this;
-    private FragmentMapBinding mBinding;
 
-   // Request
-    private RequestBusInformation mRequestBusInformation;
-//    private RequestBusNodeDetailInfo mRequestBusNodeDetailInfo;
-//    private RequestBusRouteInfo mRequestBusRouteInfo;
+public class FragmentMapBusStation extends Fragment implements OnMapReadyCallback {
+    private FragmentMapBusStation This = this;
+    private FragmentMapBusStationBinding mBinding;
 
-    // Fragment
-    public FragmentBusSelection mFragmentBusSelection;
     // UI
     private NaverMap mNaverMap;
     private MapView mMapView;
+    private ImageView mLocationBtn;
     private Marker[] mMarker;
     public Marker mSelectedMarker;
     private TextView[] mTextView;
-    //
+
     // map
-    public ZoomControlView mZoomControlView;
     private FusedLocationProviderClient mFusedLocationClient;
     private double mLatitude = -1;
     private double mLongitude = -1;
@@ -83,23 +75,15 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
     private boolean mIsLoadingDone = false;
 
     // bus
-    private int mDataCnt = 0;
-    private int mTotalDataCnt = 0;
     private BusStopFromCSV mSelectedBusData;
-    private String mBusNodeName;
-    private String mBusNextStop;
-    private String mBusNodeNumber;
     private String mBusNodeId;
-    private String mBusRouteId;
+    private String mBusStopName;
+    private String mBusNextStopName;
+    private String mBusNodeNo;
+    private boolean mIsRequestData = false;
     private ArrayList<BusStopFromCSV> mCSVBusStopList = new ArrayList<>(AppData.GetInstance().mCSVBusStopList);
 
-    ArrayList<HashMap<String, String>> mBusNumInfo = new ArrayList<>();
-    private ArrayList<BusSelection> mBusSelectionDataList = new ArrayList<>();
-    private boolean mIsRequestData = false;
-
     private Handler mHandler = new Handler(Looper.getMainLooper());
-    public int mTempLoadingTime;
-
     private Listener mListener = null;
 
     public void setListener(Listener listener) {
@@ -109,25 +93,24 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_map, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_map_bus_station, container, false);
         View mmView = mBinding.getRoot();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-
         return mmView;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (mListener != null) {
-            mListener.didRespond(This, Define.LOADING, null);
-        }
-        mMapView = getActivity().findViewById(R.id.mapView);
+//        if (mListener != null) {
+//            mListener.didRespond(This, Define.LOADING, null);
+//        }
+        mMapView = getActivity().findViewById(R.id.mapView_naver_bus_station);
         if (mMapView != null) {
             mMapView.onCreate(savedInstanceState);
         }
         //  뒤로가기
-        mBinding.backBtnMap.setOnClickListener((View.OnClickListener) v -> {
+        mBinding.backBtnMapBusStation.setOnClickListener(v -> {
             try {
                 if (getActivity().getCurrentFocus() != null) {
                     hideSoftKeyboard(getActivity());
@@ -139,26 +122,32 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        mBinding.searchBusStopName.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                if (getActivity().getCurrentFocus() != null) {
-                    hideSoftKeyboard(getActivity());
+        mBinding.searchBusStopNameBusStation.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    if (getActivity().getCurrentFocus() != null) {
+                        hideSoftKeyboard(getActivity());
+                    }
+                    try {
+                        didSearch();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return true;
                 }
+                return false;
+            }
+        });
+        // 검색버튼
+        ((ImageView) getActivity().findViewById(R.id.searchBusStopBtn_bus_station)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 try {
                     didSearch();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                return true;
-            }
-            return false;
-        });
-        // 검색버튼
-        mBinding.searchBusStopBtn.setOnClickListener((View.OnClickListener) v -> {
-            try {
-                didSearch();
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         });
         setMap();
@@ -203,16 +192,18 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
                 addMarkers();
             }
         });
-
         mNaverMap.setOnMapClickListener((pointF, latLng) -> {
             if (getActivity().getCurrentFocus() != null) {
                 hideSoftKeyboard(getActivity());
             }
-            if (mBinding.busStopInfoContainerMap != null) {
-                mBinding.busStopInfoContainerMap.setVisibility(View.GONE);
+
+
+            if (mBinding.busStopInfoContainerMapBusStation != null) {
+                mBinding.busStopInfoContainerMapBusStation.setVisibility(View.GONE);
             }
-            if (mBinding.busStopInfoSmallContainerMap != null) {
-                mBinding.busStopInfoSmallContainerMap.setVisibility(View.GONE);
+
+            if (mBinding.busStopInfoSmallContainerMapBusStation != null) {
+                mBinding.busStopInfoSmallContainerMapBusStation.setVisibility(View.GONE);
             }
             if (mSelectedMarker != null) {
                 mSelectedMarker.setVisible(false);
@@ -222,9 +213,9 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
         mmUiSettings.setZoomControlEnabled(false);
         mmUiSettings.setCompassEnabled(false);
 
-        mBinding.zoom.setMap(mNaverMap);
-        mBinding.locationBtn.setOnClickListener(v -> {
+        mBinding.zoomBusStation.setMap(mNaverMap);
 
+        mBinding.locationBtnBusStation.setOnClickListener(v -> {
             if (isLocationEnabled()) {
                 // 뿌려진 마커 초기화
                 if (mMarkerArrayList != null) {
@@ -236,14 +227,13 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
                 }
                 getCurrentUserLocation();
             } else {
-                Toast.makeText(getContext(), "'위치'를 활성화해주세요.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), Define.LOCATION_INFORM, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
             }
         });
         getCurrentUserLocation();
     }
-
 
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
@@ -256,21 +246,17 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
         mMapView.getMapAsync(This);
     }
 
-
     // 현재 유저 위치 찾음.
     @SuppressLint("MissingPermission")
     private void getCurrentUserLocation() {
-
         OnCompleteListener<Location> mCompleteListener = task -> {
             Location location = task.getResult();
             if (location == null) {
                 Toast.makeText(getContext(), "현재 위치 정보가 없습니다.", Toast.LENGTH_SHORT).show();
                 double mmLatitude = 37.881276299999996;
                 double mmLongitude = 127.73007620000001;
-
                 mLatitude = mmLatitude;
                 mLongitude = mmLongitude;
-
                 try {
                     findMyAddress(mLatitude, mLongitude);
                 } catch (Exception e) {
@@ -298,13 +284,13 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
         mNaverMap.moveCamera(cameraUpdate);
         addMarkers();
     }
-
+    
     // ### csv 데이터에서 마커 뿌리는부분
     private void addMarkers() {
         int mmDataCnt = -1;
         ArrayList<BusStopFromCSV> mmShowData = new ArrayList<>();
         // csv에서 받은 데이터 뿌리는 부분
-        if (AppData.GetInstance().mCSVBusStopList.size() > 0) {
+        if (mCSVBusStopList.size() > 0) {
             // 받은 데이터에서 일정 범위 이내의 데이터만 선별
             for (BusStopFromCSV busData : mCSVBusStopList) {
                 double mmLat = busData.getLatitude();
@@ -369,6 +355,7 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    // lati, long 기반으로 반경 계산
     final double r2d = 180.0D / 3.141592653589793D;
     final double d2r = 3.141592653589793D / 180.0D;
     final double d2km = 111189.57696D * r2d;
@@ -379,207 +366,71 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
         return Math.acos(Math.sin(x) * Math.sin(y) + Math.cos(x) * Math.cos(y) * Math.cos(d2r * (ln1 - ln2))) * d2km;
     }
 
-    // ㅇㅇㅇㅇㅇ추후에 rx로 변경
     private void showBusStopInfo2() {
-        mBusNodeNumber = mSelectedBusData.getBusNodeNum();
-        mBusNodeName = mSelectedBusData.getBusStopName();
         mBusNodeId = mSelectedBusData.getBusNodeId();
+        mBusNodeNo = mSelectedBusData.getBusNodeNum();
+        mBusStopName = mSelectedBusData.getBusStopName();
+        mBusNextStopName = mSelectedBusData.getNextBusStopName();
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        getActivity().runOnUiThread(() -> {
 
-                mBinding.busStopInfoContainerMap.setVisibility(View.VISIBLE);
-                mBinding.busStopInfoSmallContainerMap.setVisibility(View.VISIBLE);
+            mBinding.busStopInfoContainerMapBusStation.setVisibility(View.VISIBLE);
+            mBinding.busStopInfoSmallContainerMapBusStation.setVisibility(View.VISIBLE);
 
-                mBinding.busStopInfoSmallContainerMap.setOnClickListener(v -> {
-                    if (mBinding.busStopInfoSmallContainerMap.getVisibility() == View.VISIBLE) {
-                        return;
-                    }
-                });
-                mBinding.nextBtnMap.setOnClickListener(v -> {
-                    if (!mIsRequestData) {
-                        clickNextBtn();
+            mBinding.busStopInfoSmallContainerMapBusStation.setOnClickListener(v -> {
+                if (mBinding.busStopInfoSmallContainerMapBusStation.getVisibility() == View.VISIBLE) {
+                    return;
+                }
+            });
+            mBinding.nextBtnMapBusStation.setOnClickListener(v -> {
+                if (!mIsRequestData) {
+                    ArrayList<BusStation> mmBusStationList = AppData.GetInstance().mBusStationList;
+                    boolean mIsExist = false;
+                    if (mmBusStationList.size() > 0) {
+                        for (int i = 0; i < mmBusStationList.size(); i++) {
+                            if (mmBusStationList.get(i).getBusNodeId().equals(mBusNodeId)
+                                    && mmBusStationList.get(i).getBusNodeNo().equals(mBusNodeNo)
+                                    && mmBusStationList.get(i).getBusNodeName().equals(mBusStopName)) {
+                                mIsExist = true;
+                            }
+                        }
+                        if (!mIsExist) {
+                            addBusStation();
+                        } else {
+                            Toast.makeText(getContext(), "이미 추가된 버스정류장 입니다.", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(getContext(), "데이터를 불러오는 중입니다.", Toast.LENGTH_SHORT).show();
+                        addBusStation();
                     }
-                });
+                } else {
+                    Toast.makeText(getContext(), "데이터를 불러오는 중입니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-                mBinding.busStopNumberMap.setText(mSelectedBusData.getBusNodeNum());
-                mBinding.busStopNameMap.setText(mSelectedBusData.getBusStopName());
-                if (mSelectedBusData.getNextBusStopName() != null) {
-                    if (mSelectedBusData.getNextBusStopName().equals("종점")) {
-                        mBinding.nextButStopName.setText(mSelectedBusData.getNextBusStopName());
-                        mBusNextStop = mSelectedBusData.getNextBusStopName();
-                    } else {
-                        mBinding.nextButStopName.setText(mSelectedBusData.getNextBusStopName() + " 방향");
-                        mBusNextStop = mSelectedBusData.getNextBusStopName();
-                    }
+            mBinding.busStopNumberMapBusStation.setText(mSelectedBusData.getBusNodeNum());
+            mBinding.busStopNameMapBusStation.setText(mSelectedBusData.getBusStopName());
+            if (mSelectedBusData.getNextBusStopName() != null) {
+                if (mSelectedBusData.getNextBusStopName().equals("종점")) {
+                    mBinding.nextButStopNameBusStation.setText(mSelectedBusData.getNextBusStopName());
+                } else {
+                    mBinding.nextButStopNameBusStation.setText(mSelectedBusData.getNextBusStopName() + " 방향");
                 }
             }
         });
     }
 
-    // 다음 버튼 클릭했을 때 동작.
-    public void clickNextBtn() {
-        if (mBusSelectionDataList != null && mBusSelectionDataList.size() > 0) {
-            mBusSelectionDataList.clear();
-            mBusSelectionDataList = null;
-            mBusSelectionDataList = new ArrayList<>();
-        }
-        mTempLoadingTime = AppData.GetInstance().GetLoadingTimer(getContext());
-        AppData.GetInstance().SetLoadingTimer(getContext(), 40000);
+    private void addBusStation() {
+        /** 나중에 추가되는 데이터를 리스트의 맨 처음에 삽입 */
+        BusStation mmBusStationData = new BusStation(mBusNodeId, mBusNodeNo, mBusStopName, mBusNextStopName);
+        ArrayList<BusStation> mmTempCurList = new ArrayList<>();
+        mmTempCurList.add(mmBusStationData);
+        mmTempCurList.addAll(AppData.GetInstance().mBusStationList);
+        AppData.GetInstance().SetBusStationList(mmTempCurList);
+
         if (mListener != null) {
-            mListener.didRespond(This, Define.LOADING + "getBusData", null);
+            mListener.didRespond(This, Define.EVENT_DONE, null);
         }
-        requestBusNodeDetailInfo();
-    }
-
-    private ArrayList<HashMap<String, String>> mmBusInfoMapList;
-
-    private void requestBusNodeDetailInfo() {
-//        mIsRequestData = true;
-//
-//        String mmUserID = AppData.GetInstance().GetUserID(getContext());
-//        String mmBusNodeID = mBusNodeId;
-//
-//        mRequestBusNodeDetailInfo = new RequestBusNodeDetailInfo();
-//        mRequestBusNodeDetailInfo.request(mmUserID, mmBusNodeID, new RequestBusNodeDetailInfo.Listener() {
-//            @Override
-//            public void didRespond(RequestRoot request, HashMap<String, Object> properties, String error) {
-//                if (error.equals("0")) {
-//                    String mmTempUserID = properties.get(Key.USER_ID).toString();
-//                    if (mmUserID.equals(mmTempUserID)) {
-//                        if (properties.get(Key.ROUTE_LIST) != null) {
-//                            ArrayList<HashMap<String, String>> mmList = (ArrayList) properties.get(Key.ROUTE_LIST);
-//                            mmBusInfoMapList = new ArrayList<>();
-//                            for (int i = 0; i < mmList.size(); i++) {
-//                                HashMap<String, String> mmMap = mmList.get(i);
-//                                mmBusInfoMapList.add(mmMap);
-//                            }
-//                            mTotalDataCnt = mmBusInfoMapList.size();
-//                            if (mDataCnt < mTotalDataCnt) {
-//                                mBusRouteId = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_ID);
-//                                String mmBusRouteNo = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_NO);
-//                                mBusNextStop = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_NEXT_STOP);
-//                                requestBusInformation(mmBusRouteNo);
-//                            }
-//                        }
-//                    } else {
-//                        if (mListener != null) {
-//                            mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-//                        }
-//                    }
-//                } else {
-//                    if (mListener != null) {
-//                        mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-//                    }
-//                }
-//            }
-//        });
-    }
-
-    // 1. "버스 노선 조회 서비스"의 "노선번호목록조회" 기능으로 버스 번호를 입력해 해당 버스 번호(노선 번호의) 출발점, 종점 정류소 데이터를 얻는다.
-    private void requestBusInformation(String routeNo) {
-        mRequestBusInformation = new RequestBusInformation();
-        mRequestBusInformation.request(routeNo, new RequestBusInformation.Listener() {
-            @Override
-            public void didRespond(ArrayList<HashMap<String, String>> data, String error) {
-                if (error.equals("0") && data != null) {
-                    if (mBusNumInfo.size() > 0) {
-                        mBusNumInfo.clear();
-                        mBusNumInfo = null;
-                        mBusNumInfo = new ArrayList<>();
-                    }
-                    mBusNumInfo = data;
-
-                    for (int i = 0; i < mBusNumInfo.size(); i++) {
-                        if (mBusNumInfo.get(i).get(Key.BUS_ROUTE_ID).equals(mBusRouteId)) {
-                            mBusNumInfo.get(i).put(Key.BUS_NODE_NAME, mBusNodeName);
-                            mBusNumInfo.get(i).put(Key.BUS_NEXT_STOP, mBusNextStop);
-
-                            BusSelection mmBusSelectionData = new BusSelection(mBusNumInfo.get(i));
-                            mBusSelectionDataList.add(mmBusSelectionData);
-                        }
-                    }
-
-                    mDataCnt++;
-
-                    if (mDataCnt < mTotalDataCnt) {
-                        mBusRouteId = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_ID);
-                        String mmBusRouteNo = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_NO);
-                        mBusNextStop = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_NEXT_STOP);
-                        requestBusInformation(mmBusRouteNo);
-                    } else {
-                        mDataCnt = 0;
-                        if (AppData.GetInstance().mBusSelectionDataList.size() > 0) {
-                            AppData.GetInstance().mBusSelectionDataList.clear();
-                            AppData.GetInstance().mBusSelectionDataList = null;
-                        }
-                        AppData.GetInstance().SetBusSelectionDataList(mBusSelectionDataList);
-                        showFragmentBusSelection();
-                        mIsRequestData = false;
-
-                        if (mListener != null) {
-//                            mIsSuccLoading = true;
-                            mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-                        }
-                    }
-                } else if (error.equals("-1") && data == null) {
-                    mDataCnt++;
-
-                    if (mDataCnt < mTotalDataCnt) {
-                        mBusRouteId = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_ID);
-                        String mmBusRouteNo = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_NO);
-                        mBusNextStop = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_NEXT_STOP);
-                        requestBusInformation(mmBusRouteNo);
-                    } else {
-                        mDataCnt = 0;
-                        if (AppData.GetInstance().mBusSelectionDataList.size() > 0) {
-                            AppData.GetInstance().mBusSelectionDataList.clear();
-                            AppData.GetInstance().mBusSelectionDataList = null;
-                        }
-                        AppData.GetInstance().SetBusSelectionDataList(mBusSelectionDataList);
-                        showFragmentBusSelection();
-                        mIsRequestData = false;
-                        AppData.GetInstance().SetLoadingTimer(getContext(), mTempLoadingTime);
-
-                        if (mListener != null) {
-//                            mIsSuccLoading = true;
-                            mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    private void showFragmentBusSelection() {
-        if (mFragmentBusSelection != null) {
-            removeFragment(mFragmentBusSelection);
-        }
-
-        FragmentManager mFragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentBusSelection = new FragmentBusSelection();
-        mFragmentBusSelection.mBusNodeNum = mBusNodeNumber;
-        mFragmentBusSelection.mBusNodeName = mBusNodeName;
-        mFragmentBusSelection.mBusNodeId = mBusNodeId;
-        mFragmentBusSelection.setListener(new FragmentBusSelection.Listener() {
-            @Override
-            public void didRespond(Fragment fragment, String event, HashMap<String, String> data) {
-                if (event.equals(Define.EVENT_BACK) && data == null) {
-                    removeFragment(mFragmentBusSelection);
-
-                } else if (event.equals(Define.EVENT_DONE) && data == null) {
-                    removeFragment(mFragmentBusSelection);
-                    if (mListener != null) mListener.didRespond(This, Define.EVENT_DONE, null);
-                }
-            }
-        });
-        ((FrameLayout) getActivity().findViewById(R.id.mainFullFrame)).setVisibility(View.VISIBLE);
-        mFragmentTransaction.add(R.id.mainFullFrame, mFragmentBusSelection);
-        mFragmentTransaction.commit();
+        /** 나중에 추가되는 데이터를 리스트의 맨 처음에 삽입 끝*/
     }
 
     private void didSearch() {
@@ -587,26 +438,18 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
             hideSoftKeyboard(getActivity());
         }
         // request 에러방지 공백처리
-        String mmTempSearchTxt = mBinding.searchBusStopName.getText().toString();
-        String mmReplaceTxt = null;
-        if (mmTempSearchTxt.contains(" "))
-            mmReplaceTxt = mmTempSearchTxt.replace(" ", "");
-        else
-            mmReplaceTxt = mmTempSearchTxt;
+        String mmReplaceTxt = mBinding.searchBusStopNameBusStation.getText().toString().trim();
 
         if (mmReplaceTxt.equals("")) {
             _Popup.GetInstance().ShowConfirmPopup(getContext(), Define.NOTIFY_TITLE, Define.BUS_SEARCH_INFORM, Define.CONFIRM_MSG, new _Popup.ConfirmPopupListener() {
                 @Override
                 public void didSelectConfirmPopup(String title, String message, String confirmMessage) {
                     if (confirmMessage.equals("확인")) {
-                        mBinding.searchBusStopName.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mBinding.searchBusStopName.setFocusableInTouchMode(true);
-                                mBinding.searchBusStopName.requestFocus();
-                                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.showSoftInput(mBinding.searchBusStopName, 0);
-                            }
+                        mBinding.searchBusStopNameBusStation.post(() -> {
+                            mBinding.searchBusStopNameBusStation.setFocusableInTouchMode(true);
+                            mBinding.searchBusStopNameBusStation.requestFocus();
+                            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.showSoftInput(mBinding.searchBusStopNameBusStation, 0);
                         });
                     }
                 }
@@ -615,7 +458,7 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
             try {
                 // 버스정류장 이름 찾는 메소드
                 searchBusStop(mmReplaceTxt);
-                mBinding.searchBusStopName.clearFocus();
+                mBinding.searchBusStopNameBusStation.clearFocus();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -624,38 +467,39 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
 
     // 버스정류장 이름으로 버스정류장 찾는 메소드
     private void searchBusStop(String searchTxt) {
-
         boolean mmIsExist = false;
         ArrayList<BusStopFromCSV> mmSearchResultTxtList = new ArrayList<>();
-        for (int i = 0; i < AppData.GetInstance().mCSVBusStopList.size(); i++) {
-            if (AppData.GetInstance().mCSVBusStopList.get(i).getBusStopName().contains(searchTxt)) {
+
+        for (int i = 0; i < mCSVBusStopList.size(); i++) {
+            if (mCSVBusStopList.get(i).getBusStopName().contains(searchTxt)) {
                 mmIsExist = true;
-                mmSearchResultTxtList.add(AppData.GetInstance().mCSVBusStopList.get(i));
+                mmSearchResultTxtList.add(mCSVBusStopList.get(i));
             }
         }
+
         try {
             if (mmIsExist) {
                 if (mmSearchResultTxtList.size() > 0) {
-                    if (mZoomControlView != null) {
-                        mZoomControlView.setVisibility(View.GONE);
+                    if (mBinding.zoomBusStation != null) {
+                        mBinding.zoomBusStation.setVisibility(View.GONE);
                     }
-                    mBinding.searchResultContainer.setVisibility(View.VISIBLE);
-                    mBinding.searchResultSmallContainer.setVisibility(View.VISIBLE);
-                    mBinding.searchResultContainer.setOnClickListener(new View.OnClickListener() {
+                    mBinding.searchResultContainerBusStation.setVisibility(View.VISIBLE);
+                    mBinding.searchResultSmallContainerBusStation.setVisibility(View.VISIBLE);
+                    mBinding.searchResultContainerBusStation.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (mBinding.searchResultContainer.getVisibility() == View.VISIBLE) {
-                                mBinding.searchResultContainer.setVisibility(View.GONE);
-                                mZoomControlView.setVisibility(View.VISIBLE);
+                            if (mBinding.searchResultContainerBusStation.getVisibility() == View.VISIBLE) {
+                                mBinding.searchResultContainerBusStation.setVisibility(View.GONE);
+                                mBinding.zoomBusStation.setVisibility(View.VISIBLE);
                             }
-                            if (mBinding.searchResultSmallContainer != null && mBinding.searchResultSmallContainer.getVisibility() == View.VISIBLE) {
-                                mBinding.searchResultSmallContainer.setVisibility(View.GONE);
+                            if (mBinding.searchResultSmallContainerBusStation != null && mBinding.searchResultSmallContainerBusStation.getVisibility() == View.VISIBLE) {
+                                mBinding.searchResultSmallContainerBusStation.setVisibility(View.GONE);
                             }
                         }
                     });
                     if (mTextView != null) {
                         for (int i = 0; i < mTextView.length; i++) {
-                            mBinding.searchResultSmallContainer.removeView(mTextView[i]);
+                            mBinding.searchResultSmallContainerBusStation.removeView(mTextView[i]);
                         }
                     }
                     mTextView = new TextView[mmSearchResultTxtList.size()];
@@ -677,18 +521,18 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
                         mTextView[i].setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                for (int i = 0; i < AppData.GetInstance().mCSVBusStopList.size(); i++) {
-                                    if (AppData.GetInstance().mCSVBusStopList.get(i).getBusStopName().equals(mTextView[finalI].getTag())) {
-                                        if (AppData.GetInstance().mCSVBusStopList.get(i).getBusNodeId().equals(mmSearchResultTxtList.get(finalI).getBusNodeId())) {
-                                            mSelectedBusData = AppData.GetInstance().mCSVBusStopList.get(i);
-                                            i = AppData.GetInstance().mCSVBusStopList.size();
+                                for (int i = 0; i < mCSVBusStopList.size(); i++) {
+                                    if (mCSVBusStopList.get(i).getBusStopName().equals(mTextView[finalI].getTag())) {
+                                        if (mCSVBusStopList.get(i).getBusNodeId().equals(mmSearchResultTxtList.get(finalI).getBusNodeId())) {
+                                            mSelectedBusData = mCSVBusStopList.get(i);
+                                            i = mCSVBusStopList.size();
                                         }
                                     }
                                 }
                                 setSelectedEvent(mSelectedBusData);
                             }
                         });
-                        mBinding.searchResultSmallContainer.addView(mTextView[i]);
+                        mBinding.searchResultSmallContainerBusStation.addView(mTextView[i]);
                     }
                 }
             } else {
@@ -705,14 +549,14 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
     }
 
     private void setSelectedEvent(BusStopFromCSV busData) {
-        if (mBinding.searchResultContainer != null) {
-            mBinding.searchResultContainer.setVisibility(View.GONE);
+        if (mBinding.searchResultContainerBusStation != null) {
+            mBinding.searchResultContainerBusStation.setVisibility(View.GONE);
         }
-        if (mBinding.searchResultSmallContainer != null && mBinding.searchResultSmallContainer.getVisibility() == View.VISIBLE) {
-            mBinding.searchResultSmallContainer.setVisibility(View.GONE);
+        if (mBinding.searchResultSmallContainerBusStation != null && mBinding.searchResultSmallContainerBusStation.getVisibility() == View.VISIBLE) {
+            mBinding.searchResultSmallContainerBusStation.setVisibility(View.GONE);
         }
-        if (mZoomControlView != null) {
-            mZoomControlView.setVisibility(View.VISIBLE);
+        if (mBinding.zoomBusStation != null) {
+            mBinding.zoomBusStation.setVisibility(View.VISIBLE);
         }
 
         Double latitude = busData.getLatitude();
@@ -741,19 +585,8 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
                 activity.getCurrentFocus().getWindowToken(), 0);
     }
 
-    private void removeFragment(Fragment fragment) {
-        FragmentManager mFragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.remove(fragment);
-        mFragmentTransaction.commit();
-        fragment.onDestroy();
-        fragment.onDetach();
-        fragment = null;
-    }
-
     public interface Listener {
         public void didRespond(Fragment fragment, String event, HashMap<String, String> data);
     }
 
 }
-

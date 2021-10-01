@@ -1,7 +1,19 @@
 package com.yoon.rxjavatest.Fragment;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+
+import com.yoon.rxjavatest.Define;
+import com.yoon.rxjavatest.R;
+import com.yoon.rxjavatest.databinding.FragmentBusSelectionBinding;
 
 import java.util.HashMap;
 
@@ -9,7 +21,8 @@ import java.util.HashMap;
 
 public class FragmentBusSelection extends Fragment {
     private FragmentBusSelection This = this;
-//
+    private FragmentBusSelectionBinding mBinding;
+    //
 //    // UI
 //    private ListView mListView;
 //
@@ -52,16 +65,18 @@ public class FragmentBusSelection extends Fragment {
     public void setListener(Listener listener) {
         mListener = listener;
     }
-//
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        return inflater.inflate(R.layout.fragment_bus_selection, container, false);
-//    }
-//
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_bus_selection, container, false);
+        View mmView = mBinding.getRoot();
+        return mmView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 //
 //        mAdapterBusList = new AdapterBusSelection(getContext(), AppData.GetInstance().mBusSelectionDataList, This);
 //        mAdapterBusList.setListener(new AdapterBusSelection.Listener() {
@@ -74,13 +89,10 @@ public class FragmentBusSelection extends Fragment {
 //            }
 //        });
 //
-//        ((ImageView) getActivity().findViewById(R.id.backBtn_BusSelection)).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (mListener != null) mListener.didRespond(This, Define.EVENT_BACK, null);
-//            }
-//        });
-//
+        mBinding.backBtnBusSelection.setOnClickListener(v -> {
+            if (mListener != null) mListener.didRespond(This, Define.EVENT_BACK, null);
+        });
+
 //        ((TextView) getActivity().findViewById(R.id.confirmBtn_BusSelection)).setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -174,7 +186,7 @@ public class FragmentBusSelection extends Fragment {
 //            }
 //        });
 //
-//    }
+    }
 //
 //    private void RequestBusRouteInfo() {
 //        String mmUserID = AppData.GetInstance().GetUserID(getContext());

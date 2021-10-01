@@ -5,8 +5,8 @@ public class Define {
     public static final String FRAGMENT_BUS = "FragmentBus";
     public static final String FRAGMENT_MAP = "FragmentMap";
     public static final String FRAGMENT_MAP_GET_BUS_DATA = "FragmentMapGetBusData";
-    public static final String FRAGMENT_TRANSPORTATION = "FragmentTransportation";
-    public static final String FRAGMENT_TRANSPORTATION_DETAIL = "FragmentTransportationDetail";
+    public static final String FRAGMENT_BUS_STATION = "FragmentBusStation";
+    public static final String FRAGMENT_BUS_STATION_DETAIL = "FragmentBusStationDetail";
     public static final String FRAGMENT_SEARCH= "FragmentSearch";
 
     /** 이벤트 */
@@ -43,8 +43,7 @@ public class Define {
 
     /** 팝업 메세지 */
     public static final String NETWORK_INFORM = "인터넷 연결이 되어있지 않습니다.\n인터넷 연결 후 앱을 다시 실행하여 주십시오.\nWiFi 설정화면으로 이동합니다.";
-    public static final String UPDATE_TITLE = "업데이트 요청";
-    public static final String UPDATE_INFORM = "최신 버전으로 업데이트를 해주시기 바랍니다.\n업데이트 페이지로 이동합니다.";
+    public static final String LOCATION_INFORM = "설정에서 '위치'를 활성화해주세요.";
     public static final String RESTART_INFORM = "앱을 재실행합니다.";
     public static final String PERMISSION_DENIED_INFORM = "권한이 거부되었습니다.\n앱 이용을 위하여 해당 권한을 허용하여 주시기 바랍니다.\n앱을 종료합니다.";
     public static final String PERMISSION_DENIED_WRITE_INFORM = "권한이 거부되었습니다.\n서비스 이용을 위하여 해당 권한을 허용하여 주시기 바랍니다.";
@@ -52,8 +51,6 @@ public class Define {
     public static final String FILE_INFORM = "서비스를 실행하기 위한 데이터를 가져오는데 문제가 발생하였습니다.\n네트워크 상태를 확인하시고 다시 실행하여 주시기 바랍니다.";
     public static final String SEARCH_INFORM = "검색어를 입력하여 주십시오.";
     public static final String BUS_SEARCH_INFORM = "버스정류장 이름을 입력하여 주십시오.";
-    public static final String SSL_INFORM = "해당 사이트로 진입 하시겠습니까?";
-    public static final String SSL_NAGATIVE = "확인 버튼을 눌러야 서비스 이용이 가능합니다.";
 
     public static final String NOTIFY_TITLE = "알림";
     public static final String CONFIRM_MSG = "확인";

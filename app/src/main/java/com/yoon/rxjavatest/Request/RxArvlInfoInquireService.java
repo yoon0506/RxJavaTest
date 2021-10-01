@@ -1,8 +1,7 @@
 package com.yoon.rxjavatest.Request;
 
-import com.yoon.rxjavatest.Key;
 import com.yoon.rxjavatest.Api.Example;
-
+import com.yoon.rxjavatest.Key;
 
 import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
@@ -13,18 +12,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public class RequestBusInfoRequireService {
+public class RxArvlInfoInquireService {
 
-    public RequestBusInfoRequireService.RouteAcctoBus getBusAPI(){
+    public RxArvlInfoInquireService.BusArvlInfo getBusAPI(){
         Retrofit mmRetrofit = new Retrofit.Builder()
                 .baseUrl(Key.BASE_URI)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        return mmRetrofit.create(RequestBusInfoRequireService.RouteAcctoBus.class);
+        return mmRetrofit.create(RxArvlInfoInquireService.BusArvlInfo.class);
     }
 
-    public RequestBusInfoRequireService.RouteAcctoBus getServiceAPI(){
+    public RxArvlInfoInquireService.BusArvlInfo getServiceAPI(){
 
         HttpLoggingInterceptor mmLogInterceptor = new HttpLoggingInterceptor();
         mmLogInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -40,35 +39,28 @@ public class RequestBusInfoRequireService {
                 .baseUrl(Key.BASE_URI)
                 .build();
 
-        return mmRetrofit.create(RequestBusInfoRequireService.RouteAcctoBus.class);
+        return mmRetrofit.create(RxArvlInfoInquireService.BusArvlInfo.class);
     }
 
-    private RequestBusInfoRequireService(){
+    private RxArvlInfoInquireService(){
 
     }
 
     private static class Singleton{
-        private static final RequestBusInfoRequireService mInstance = new RequestBusInfoRequireService();
+        private static final RxArvlInfoInquireService mInstance = new RxArvlInfoInquireService();
     }
 
-    public static RequestBusInfoRequireService getInstance(){
-        return RequestBusInfoRequireService.Singleton.mInstance;
+    public static RxArvlInfoInquireService getInstance(){
+        return RxArvlInfoInquireService.Singleton.mInstance;
     }
 
-    public interface RouteAcctoBus{
-//        @GET("BusRouteInfoInqireService/getRouteNoList?")
-//        Call<Example> getCallBus(
-//                @Query(value = "serviceKey", encoded = true) String serviceKey,
-//                @Query(value = "cityCode", encoded = true) String cityCode,
-//                @Query(value = "routeId", encoded = true) String routeId,
-//                @Query("_type") String json
-//        );
-
-        @GET("BusRouteInfoInqireService/getRouteNoList?")
-        Observable<Example> getObBus(
+    public interface BusArvlInfo{
+        @GET("/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList?")
+        Observable<Example> getObArvlInfo(
                 @Query(value = "serviceKey", encoded = true) String serviceKey,
                 @Query(value = "cityCode", encoded = true) String cityCode,
-                @Query(value = "routeId", encoded = true) String routeId,
+                @Query(value = "nodeid", encoded = true) String nodeId,
+                @Query(value = "numOfRows", encoded = true) String nomOfRows,
                 @Query("_type") String json
         );
     }

@@ -25,7 +25,7 @@ import com.yoon.rxjavatest.AppData;
 import com.yoon.rxjavatest.Define;
 import com.yoon.rxjavatest.Key;
 import com.yoon.rxjavatest.R;
-import com.yoon.rxjavatest.Request.RequestBusInfoRequireService;
+import com.yoon.rxjavatest.Request.RequestBusRouteInfoInquireService;
 import com.yoon.rxjavatest.Request.RequestRouteAcctoBusList;
 import com.yoon.rxjavatest.Request.RequestRxRouteAcctoBusList;
 import com.yoon.rxjavatest.busData.BusStop;
@@ -369,7 +369,7 @@ public class FragmentBus extends Fragment {
 
     private void startRx() {
         mRouteId = "CCB250020001";
-        RequestBusInfoRequireService.RouteAcctoBus mmService = RequestBusInfoRequireService.getInstance().getServiceAPI();
+        RequestBusRouteInfoInquireService.RouteAcctoBus mmService = RequestBusRouteInfoInquireService.getInstance().getServiceAPI();
         Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE, mRouteId, Key.TYPE_JSON);
 
         mCompositeDisposable = new CompositeDisposable();
