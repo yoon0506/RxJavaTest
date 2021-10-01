@@ -111,6 +111,7 @@ public class ActivityLanding extends AppCompatActivity {
     }
 
     private void getBusStationInfoFromCSV(){
+        ArrayList<BusStopFromCSV> mmTempBusDataList = new ArrayList<>();
         mBusStationInfo = new ArrayList<>();
         try {
             InputStream is = getAssets().open(mBusStopInfoFileName);
@@ -135,9 +136,9 @@ public class ActivityLanding extends AppCompatActivity {
                 mmData.put(Key.BUS_LATITUDE, mmLati);
                 mmData.put(Key.BUS_LONGITUDE, mmLongi);
                 BusStopFromCSV mmCsvBusStopData = new BusStopFromCSV(mmData);
-                AppData.GetInstance().mCSVBusStopList.add(mmCsvBusStopData);
+                mmTempBusDataList.add(mmCsvBusStopData);
             }
-
+            AppData.GetInstance().SetCSVBusStopList(mmTempBusDataList);
             startAnim();
         } catch (Exception e) {
             e.printStackTrace();

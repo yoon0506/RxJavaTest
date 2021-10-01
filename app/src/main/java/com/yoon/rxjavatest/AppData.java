@@ -153,44 +153,50 @@ public class AppData {
 //
 //    // csv에서 받은 버스 정류장 정보 리스트
     public ArrayList<BusStopFromCSV> mCSVBusStopList = new ArrayList<>();
+
+    public void SetCSVBusStopList(ArrayList<BusStopFromCSV> list){
+        if(list != null){
+            mCSVBusStopList = new ArrayList<>();
+            for(BusStopFromCSV data : list){
+                mCSVBusStopList.add(data);
+            }
+        }
+    }
 //
 //    // 버스 정류장 리스트
     public ArrayList<BusStop> mBusStopList = new ArrayList<>();
 
-    public ArrayList<BusStop> SetBusStopList(ArrayList<BusStop> arrayList) {
+    public void SetBusStopList(ArrayList<BusStop> arrayList) {
         if (arrayList != null) {
             mBusStopList = new ArrayList<>();
             for (BusStop busStopList : arrayList) {
                 mBusStopList.add(busStopList);
             }
         }
-        return mBusStopList;
     }
 
     // 선택된 버스의 타임라인 정보
     public ArrayList<BusTimeLine> mBusTimeLineList = new ArrayList<>();
 
-    public ArrayList<BusTimeLine> SetBusTimeLineList(ArrayList<BusTimeLine> arrayList) {
+    public void SetBusTimeLineList(ArrayList<BusTimeLine> arrayList) {
         if (arrayList != null) {
             mBusTimeLineList = new ArrayList<>();
             for (BusTimeLine busTimeLineList : arrayList) {
                 mBusTimeLineList.add(busTimeLineList);
             }
         }
-        return mBusTimeLineList;
     }
 
 //    // 해당 정류장의 버스 리스트 정보
     public ArrayList<BusSelection> mBusSelectionDataList = new ArrayList<>();
 //
-    public ArrayList<BusSelection> SetBusSelectionDataList(ArrayList<BusSelection> arrayList) {
+    public void SetBusSelectionDataList(ArrayList<BusSelection> arrayList) {
         if (arrayList != null) {
             mBusSelectionDataList = new ArrayList<>();
             for (BusSelection busTimeLineList : arrayList) {
                 mBusSelectionDataList.add(busTimeLineList);
             }
         }
-        return mBusSelectionDataList;
     }
 //
 //    // 알림을 받을 버스 리스트 정보
