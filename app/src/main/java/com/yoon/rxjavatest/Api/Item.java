@@ -8,12 +8,19 @@ import java.util.List;
 
 public class Item {
     //    String
-    @SerializedName("endnodenm")
+
+    @SerializedName("arrprevstationcnt")
     @Expose
-    private String endnodenm;
-    @SerializedName("endvehicletime")
+    private Integer arrprevstationcnt;
+    @SerializedName("arrtime")
     @Expose
-    private String endvehicletime;
+    private Integer arrtime;
+    @SerializedName("nodeid")
+    @Expose
+    private String nodeid;
+    @SerializedName("nodenm")
+    @Expose
+    private String nodenm;
     @SerializedName("routeid")
     @Expose
     private String routeid;
@@ -23,27 +30,40 @@ public class Item {
     @SerializedName("routetp")
     @Expose
     private String routetp;
-    @SerializedName("startnodenm")
+    @SerializedName("vehicletp")
     @Expose
-    private String startnodenm;
-    @SerializedName("startvehicletime")
-    @Expose
-    private String startvehicletime;
+    private String vehicletp;
 
-    public String getEndnodenm() {
-        return endnodenm;
+    public Integer getArrprevstationcnt() {
+        return arrprevstationcnt;
     }
 
-    public void setEndnodenm(String endnodenm) {
-        this.endnodenm = endnodenm;
+    public void setArrprevstationcnt(Integer arrprevstationcnt) {
+        this.arrprevstationcnt = arrprevstationcnt;
     }
 
-    public String getEndvehicletime() {
-        return endvehicletime;
+    public Integer getArrtime() {
+        return arrtime;
     }
 
-    public void setEndvehicletime(String endvehicletime) {
-        this.endvehicletime = endvehicletime;
+    public void setArrtime(Integer arrtime) {
+        this.arrtime = arrtime;
+    }
+
+    public String getNodeid() {
+        return nodeid;
+    }
+
+    public void setNodeid(String nodeid) {
+        this.nodeid = nodeid;
+    }
+
+    public String getNodenm() {
+        return nodenm;
+    }
+
+    public void setNodenm(String nodenm) {
+        this.nodenm = nodenm;
     }
 
     public String getRouteid() {
@@ -70,32 +90,26 @@ public class Item {
         this.routetp = routetp;
     }
 
-    public String getStartnodenm() {
-        return startnodenm;
+    public String getVehicletp() {
+        return vehicletp;
     }
 
-    public void setStartnodenm(String startnodenm) {
-        this.startnodenm = startnodenm;
+    public void setVehicletp(String vehicletp) {
+        this.vehicletp = vehicletp;
     }
 
-    public String getStartvehicletime() {
-        return startvehicletime;
-    }
-
-    public void setStartvehicletime(String startvehicletime) {
-        this.startvehicletime = startvehicletime;
-    }
 
     @Override
     public String toString() {
         return "{" +
-                "endnodenm='" + endnodenm + '\'' +
-                ", endvehicletime='" + endvehicletime + '\'' +
+                "arrprevstationcnt='" + arrprevstationcnt + '\'' +
+                ", arrtime='" + arrtime + '\'' +
+                ", nodeid='" + nodeid + '\'' +
+                ", nodenm='" + nodenm + '\'' +
                 ", routeid='" + routeid + '\'' +
                 ", routeno='" + routeno + '\'' +
                 ", routetp='" + routetp + '\'' +
-                ", startnodenm='" + startnodenm + '\'' +
-                ", startvehicletime='" + startvehicletime + '\'' +
+                ", vehicletp='" + vehicletp + '\'' +
                 '}';
     }
 }

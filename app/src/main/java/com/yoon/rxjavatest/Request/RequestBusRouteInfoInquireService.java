@@ -14,16 +14,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public class RequestBusRouteInfoInquireService {
-
-    public RequestBusRouteInfoInquireService.RouteAcctoBus getBusAPI(){
-        Retrofit mmRetrofit = new Retrofit.Builder()
-                .baseUrl(Key.BASE_URI)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        return mmRetrofit.create(RequestBusRouteInfoInquireService.RouteAcctoBus.class);
-    }
-
     public RequestBusRouteInfoInquireService.RouteAcctoBus getServiceAPI(){
 
         HttpLoggingInterceptor mmLogInterceptor = new HttpLoggingInterceptor();
@@ -56,20 +46,12 @@ public class RequestBusRouteInfoInquireService {
     }
 
     public interface RouteAcctoBus{
-//        @GET("BusRouteInfoInqireService/getRouteNoList?")
-//        Call<Example> getCallBus(
-//                @Query(value = "serviceKey", encoded = true) String serviceKey,
-//                @Query(value = "cityCode", encoded = true) String cityCode,
-//                @Query(value = "routeId", encoded = true) String routeId,
-//                @Query("_type") String json
-//        );
-
         @GET("BusRouteInfoInqireService/getRouteNoList?")
         Observable<Example> getObBus(
                 @Query(value = "serviceKey", encoded = true) String serviceKey,
-                @Query(value = "cityCode", encoded = true) String cityCode,
-                @Query(value = "routeId", encoded = true) String routeId,
-                @Query("_type") String json
+                @Query(value = "cityCode", encoded = true) String cityCode
+//                @Query(value = "routeId", encoded = true) String routeId,
+//                @Query("_type") String json
         );
     }
 }

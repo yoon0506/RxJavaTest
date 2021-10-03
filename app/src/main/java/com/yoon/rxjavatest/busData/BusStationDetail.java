@@ -3,13 +3,17 @@ package com.yoon.rxjavatest.busData;
 public class BusStationDetail {
     private String busArriveInfo;
     private String arrTime;
+    private String nodeId;
+    private String nodeNm;
     private String routeId;
     private String routeNo;
     private String routeTp;
 
-    public BusStationDetail(String busArriveInfo, String arrTime, String routeId, String routeNo, String routeTp) {
+    public BusStationDetail(String busArriveInfo, String arrTime, String nodeId, String nodeNm, String routeId, String routeNo, String routeTp) {
         this.busArriveInfo = busArriveInfo;
         this.arrTime = arrTime;
+        this.nodeId = nodeId;
+        this.nodeNm = nodeNm;
         this.routeId = routeId;
         this.routeNo = routeNo;
         this.routeTp = routeTp;
@@ -55,4 +59,19 @@ public class BusStationDetail {
         this.routeTp = routeTp;
     }
 
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public String getNodeNm() {
+        return nodeNm;
+    }
+
+    public void setNodeNm(String nodeNm) {
+        this.nodeNm = nodeNm;
+    }
 }

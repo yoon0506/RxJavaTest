@@ -370,7 +370,8 @@ public class FragmentBus extends Fragment {
     private void startRx() {
         mRouteId = "CCB250020001";
         RequestBusRouteInfoInquireService.RouteAcctoBus mmService = RequestBusRouteInfoInquireService.getInstance().getServiceAPI();
-        Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE, mRouteId, Key.TYPE_JSON);
+//        Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE, mRouteId, Key.TYPE_JSON);
+        Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE);
 
         mCompositeDisposable = new CompositeDisposable();
         mCompositeDisposable.add(
@@ -383,7 +384,8 @@ public class FragmentBus extends Fragment {
 //                                                   Timber.tag("checkCheck").d("data : %s", data.toString());
 //                                               }
                                                Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
-                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+//                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+//                                               Item busData = strings.getResponse().getBody().getItems().getItem();
 
                                            }
 

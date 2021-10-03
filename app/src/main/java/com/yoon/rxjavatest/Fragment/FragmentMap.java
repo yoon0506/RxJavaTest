@@ -328,21 +328,21 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
                 mmDataCnt++;
                 double mmLat = showData.getLatitude() - 0.00004;
                 double mmLong = showData.getLongitude() + 0.00004;
-                String mmBusNodeNo = showData.getBusNodeNum();
+                String mmBusNodeId = showData.getBusNodeId();
                 // 마커
                 mMarker[mmDataCnt] = new Marker();
                 mMarker[mmDataCnt].setIconPerspectiveEnabled(true);
                 mMarker[mmDataCnt].setPosition(new LatLng(mmLat, mmLong));
                 mMarker[mmDataCnt].setIcon(OverlayImage.fromResource(R.drawable.marker_station));
                 mMarker[mmDataCnt].setMap(mNaverMap);
-                mMarker[mmDataCnt].setTag(mmBusNodeNo);
+                mMarker[mmDataCnt].setTag(mmBusNodeId);
                 mMarker[mmDataCnt].setOnClickListener(overlay -> {
                     for (BusStopFromCSV busStopList : mCSVBusStopList) {
                         Double mmLatitude = Double.parseDouble(busStopList.getLatitude() + "");
                         Double mmLongitude = Double.parseDouble(busStopList.getLongitude() + "");
                         mLatLng = new LatLng(mmLatitude, mmLongitude);
-                        String mmTempBusNodeNo = busStopList.getBusNodeNum();
-                        if (overlay.getTag().toString().equals(mmTempBusNodeNo)) {
+                        String mmTempBusNodeId = busStopList.getBusNodeId();
+                        if (overlay.getTag().toString().equals(mmTempBusNodeId)) {
                             mSelectedBusData = busStopList;
                             if (mSelectedMarker != null) {
                                 mSelectedMarker.setMap(null);

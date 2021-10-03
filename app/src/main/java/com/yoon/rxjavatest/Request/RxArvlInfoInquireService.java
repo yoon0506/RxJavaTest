@@ -13,16 +13,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public class RxArvlInfoInquireService {
-
-    public RxArvlInfoInquireService.BusArvlInfo getBusAPI(){
-        Retrofit mmRetrofit = new Retrofit.Builder()
-                .baseUrl(Key.BASE_URI)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        return mmRetrofit.create(RxArvlInfoInquireService.BusArvlInfo.class);
-    }
-
     public RxArvlInfoInquireService.BusArvlInfo getServiceAPI(){
 
         HttpLoggingInterceptor mmLogInterceptor = new HttpLoggingInterceptor();
@@ -55,11 +45,11 @@ public class RxArvlInfoInquireService {
     }
 
     public interface BusArvlInfo{
-        @GET("/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList?")
+        @GET("ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList?")
         Observable<Example> getObArvlInfo(
                 @Query(value = "serviceKey", encoded = true) String serviceKey,
                 @Query(value = "cityCode", encoded = true) String cityCode,
-                @Query(value = "nodeid", encoded = true) String nodeId,
+                @Query(value = "nodeId", encoded = true) String nodeId,
                 @Query(value = "numOfRows", encoded = true) String nomOfRows,
                 @Query("_type") String json
         );

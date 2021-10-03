@@ -14,6 +14,7 @@ public class Define {
     public static final String EVENT_DONE = "done";
     public static final String EVENT_DELETE = "delete";
     public static final String EVENT_CLICK_ITEM = "click_item";
+    public static final String EVENT_LONG_CLICK_ITEM = "long_click_item";
     public static final String EVENT_NOTI_ON = "noti_on";
     public static final String EVENT_NOTI_OFF = "noti_off";
     public static final String EVENT_CHROME = "chrome";

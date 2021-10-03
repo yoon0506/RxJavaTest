@@ -122,15 +122,15 @@ public class ActivityLanding extends AppCompatActivity {
             List<String[]> nextLine = reader.readAll();
             
             for (String[] str : nextLine){
-                String mmNodeId = str[0];
-                String mmNodeNum = str[3];
-                String mmBusStopName = str[4];
+                String mmNodeId = str[3].trim();
+                String mmNodeNum = str[3].trim();
+                String mmBusStopName = str[4].trim();
 //                String mmNextBusStopName = str[5];
-                String mmLati = str[6];
-                String mmLongi = str[5];
+                String mmLati = str[6].trim();
+                String mmLongi = str[5].trim();
                 HashMap<String, String> mmData = new HashMap<>();
                 mmData.put(Key.BUS_NODE_ID, mmNodeId);
-                mmData.put(Key.BUS_NODE_NO, mmNodeNum);
+//                mmData.put(Key.BUS_NODE_NO, mmNodeNum);
                 mmData.put(Key.BUS_NODE_NAME, mmBusStopName);
 //                mmData.put(Key.BUS_NEXT_STOP, mmNextBusStopName);
                 mmData.put(Key.BUS_LATITUDE, mmLati);

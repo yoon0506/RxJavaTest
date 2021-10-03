@@ -53,6 +53,8 @@ import com.yoon.rxjavatest.databinding.FragmentMapBusStationBinding;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import timber.log.Timber;
+
 
 public class FragmentMapBusStation extends Fragment implements OnMapReadyCallback {
     private FragmentMapBusStation This = this;
@@ -189,6 +191,9 @@ public class FragmentMapBusStation extends Fragment implements OnMapReadyCallbac
                 }
                 mLatitude = mNaverMap.getCameraPosition().target.latitude;
                 mLongitude = mNaverMap.getCameraPosition().target.longitude;
+
+                Timber.tag("checkCheck").d("mLatitude : %s", mLatitude);
+                Timber.tag("checkCheck").d("mLongitude : %s", mLongitude);
                 addMarkers();
             }
         });
@@ -314,21 +319,21 @@ public class FragmentMapBusStation extends Fragment implements OnMapReadyCallbac
                 mmDataCnt++;
                 double mmLat = showData.getLatitude() - 0.00004;
                 double mmLong = showData.getLongitude() + 0.00004;
-                String mmBusNodeNo = showData.getBusNodeNum();
+                String mmBusNodeId = showData.getBusNodeId();
                 // 마커
                 mMarker[mmDataCnt] = new Marker();
                 mMarker[mmDataCnt].setIconPerspectiveEnabled(true);
                 mMarker[mmDataCnt].setPosition(new LatLng(mmLat, mmLong));
                 mMarker[mmDataCnt].setIcon(OverlayImage.fromResource(R.drawable.marker_station));
                 mMarker[mmDataCnt].setMap(mNaverMap);
-                mMarker[mmDataCnt].setTag(mmBusNodeNo);
+                mMarker[mmDataCnt].setTag(mmBusNodeId);
                 mMarker[mmDataCnt].setOnClickListener(overlay -> {
                     for (BusStopFromCSV busStopList : mCSVBusStopList) {
                         Double mmLatitude = Double.parseDouble(busStopList.getLatitude() + "");
                         Double mmLongitude = Double.parseDouble(busStopList.getLongitude() + "");
                         mLatLng = new LatLng(mmLatitude, mmLongitude);
-                        String mmTempBusNodeNo = busStopList.getBusNodeNum();
-                        if (overlay.getTag().toString().equals(mmTempBusNodeNo)) {
+                        String mmTempBusNodeId = busStopList.getBusNodeId();
+                        if (overlay.getTag().toString().equals(mmTempBusNodeId)) {
                             mSelectedBusData = busStopList;
                             if (mSelectedMarker != null) {
                                 mSelectedMarker.setMap(null);
@@ -422,6 +427,7 @@ public class FragmentMapBusStation extends Fragment implements OnMapReadyCallbac
     private void addBusStation() {
         /** 나중에 추가되는 데이터를 리스트의 맨 처음에 삽입 */
         BusStation mmBusStationData = new BusStation(mBusNodeId, mBusNodeNo, mBusStopName, mBusNextStopName);
+//        BusStation mmBusStationData = new BusStation(mBusNodeId,  mBusStopName, mBusNextStopName);
         ArrayList<BusStation> mmTempCurList = new ArrayList<>();
         mmTempCurList.add(mmBusStationData);
         mmTempCurList.addAll(AppData.GetInstance().mBusStationList);
@@ -536,12 +542,7 @@ public class FragmentMapBusStation extends Fragment implements OnMapReadyCallbac
                     }
                 }
             } else {
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), "일치하는 정보가 없습니다.", Toast.LENGTH_SHORT).show();
-                    }
-                }, 0);
+                mHandler.postDelayed(() -> Toast.makeText(getContext(), "일치하는 정보가 없습니다.", Toast.LENGTH_SHORT).show(), 0);
             }
         } catch (Exception e) {
             e.printStackTrace();
