@@ -9,6 +9,9 @@ public class BusStationDetail {
     private String routeNo;
     private String routeTp;
 
+    public BusStationDetail() {
+    }
+
     public BusStationDetail(String busArriveInfo, String arrTime, String nodeId, String nodeNm, String routeId, String routeNo, String routeTp) {
         this.busArriveInfo = busArriveInfo;
         this.arrTime = arrTime;

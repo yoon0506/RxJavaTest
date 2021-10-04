@@ -1,6 +1,8 @@
 package com.yoon.rxjavatest.Fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +15,9 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.yoon.rxjavatest.Adapter.AdapterBusStation;
+import com.yoon.rxjavatest.Adapter.AdapterBusStationDetail;
 import com.yoon.rxjavatest.Api.Example;
 import com.yoon.rxjavatest.Api.Item;
 import com.yoon.rxjavatest.AppData;
@@ -22,8 +25,10 @@ import com.yoon.rxjavatest.Define;
 import com.yoon.rxjavatest.Key;
 import com.yoon.rxjavatest.R;
 import com.yoon.rxjavatest.Request.RxArvlInfoInquireService;
+import com.yoon.rxjavatest._Library._Popup;
 import com.yoon.rxjavatest.busData.BusStation;
 import com.yoon.rxjavatest.busData.BusStationDetail;
+import com.yoon.rxjavatest.busData.SaveManagerBusStation;
 import com.yoon.rxjavatest.databinding.FragmentBusStationBinding;
 
 import java.util.ArrayList;
@@ -47,7 +52,9 @@ public class FragmentBusStation extends Fragment {
     // UI
     private View mFooterView;
     private ImageView mAddBusBtn;
-    private AdapterBusStation mAdapterBusStation;
+//    private AdapterBusStation mAdapterBusStation
+
+    private AdapterBusStationDetail mAdapterBusStation;
 
     // rxJava
     private Disposable mDisposable;
@@ -76,9 +83,30 @@ public class FragmentBusStation extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         try {
-            mAdapterBusStation = new AdapterBusStation(getContext(), This);
+            mAdapterBusStation = new AdapterBusStationDetail(getContext(), mBusStationDetailList);
             mBinding.timeLineListView.setAdapter(mAdapterBusStation);
+            mBinding.timeLineListView.setLayoutManager(new LinearLayoutManager(getContext()));
+            mAdapterBusStation.SetListener(busData -> {
+                if (busData != null) {
+                    _Popup.GetInstance().ShowBinaryPopup(getContext(), busData.get(Key.BUS_NODE_NAME) + " " +Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
+                            (mainMessage, selectMessage) -> {
+                                if (selectMessage.equals("확인")) {
+                                    for (BusStationDetail data : mBusStationDetailList) {
+                                        if (data.getNodeId().equals(busData.get(Key.BUS_NODE_ID))) {
+                                            AppData.GetInstance().mBusStationDetailList.remove(data);
+                                        }
+                                    }
 
+                                    // 임시.. mBusStationList와 mBusStationDetailList 통합 필요
+                                    for(BusStation data: mBusStationList){
+                                        if (busData.get(Key.BUS_NODE_ID).contains(data.getBusNodeId())) {
+                                            AppData.GetInstance().mBusStationList.remove(data);
+                                        }
+                                    }
+                                }
+                            });
+                }
+            });
             // 새로고침 버튼
             mBinding.updateBtn.setOnClickListener(v -> updateBusStationList());
             // 서버로부터 도착 정보 받아옴
@@ -108,17 +136,14 @@ public class FragmentBusStation extends Fragment {
                                            @Override
                                            public void onNext(@NonNull Example strings) {
                                                Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
-//                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
-//                                               for (Item data : busData){
-//                                                   BusStationDetail detailData = new BusStationDetail(data.getArrprevstationcnt()+"", data.getArrtime()+"", data.getNodeid(), data.getNodenm(), data.getRouteid(),data.getRouteno(),data.getRoutetp());
-//                                                   mBusStationDetailList.add(detailData);
-//                                               }
-
-                                               Item busData = strings.getResponse().getBody().getItems().getItem();
-                                               BusStationDetail detailData = new BusStationDetail(busData.getArrprevstationcnt() + "", busData.getArrtime() + "", busData.getNodeid(), busData.getNodenm(), busData.getRouteid(), busData.getRouteno(), busData.getRoutetp());
-                                               mBusStationDetailList.add(detailData);
-
-
+                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+                                               for (Item data : busData) {
+                                                   BusStationDetail detailData = new BusStationDetail(data.getArrprevstationcnt() + "", data.getArrtime() + "", data.getNodeid(), data.getNodenm(), data.getRouteid(), data.getRouteno(), data.getRoutetp());
+                                                   mBusStationDetailList.add(detailData);
+                                               }
+//                                               Item busData = strings.getResponse().getBody().getItems().getItem();
+//                                               BusStationDetail detailData = new BusStationDetail(busData.getArrprevstationcnt() + "", busData.getArrtime() + "", busData.getNodeid(), busData.getNodenm(), busData.getRouteid(), busData.getRouteno(), busData.getRoutetp());
+//                                               mBusStationDetailList.add(detailData);
                                                if (mAdapterBusStation != null) {
                                                    mAdapterBusStation.notifyDataSetChanged();
                                                    mBinding.timeLineListView.setAdapter(mAdapterBusStation);
@@ -145,7 +170,7 @@ public class FragmentBusStation extends Fragment {
             mFooterView.setTag("footer");
             // 등록된 버스가 1개 이상 있으면
             if (mBusStationList.size() > 0) {
-                mBinding.timeLineListView.addFooterView(mFooterView);
+                mBinding.timeLineListView.addView(mFooterView);
                 // 버스 추가 더하기 버튼
                 mAddBusBtn = mFooterView.findViewById(R.id.addBusBtn);
             } else {
@@ -174,15 +199,13 @@ public class FragmentBusStation extends Fragment {
                     removeFragment(mFragmentMapBusStation);
                     // ㅇㅇㅇㅇㅇ추후rx로 수정
                     new Thread((Runnable) () -> getActivity().runOnUiThread((Runnable) () -> ((FrameLayout) getActivity().findViewById(R.id.mainFullFrame)).setVisibility(View.GONE)));
-                    AppData.GetInstance().mIsNaverMapOn = false;
                 } else if (event.equals(Define.EVENT_DONE) && data == null) {
                     // 버스 정류장 추가
-//                        saveByPreference(createSaveData());
+                    saveByPreference(createSaveData());
 
                     // ㅇㅇㅇㅇㅇ추후rx로 수정
                     new Thread((Runnable) () -> getActivity().runOnUiThread((Runnable) () -> ((FrameLayout) getActivity().findViewById(R.id.mainFullFrame)).setVisibility(View.GONE)));
                     removeFragment(mFragmentMapBusStation);
-                    AppData.GetInstance().mIsNaverMapOn = false;
                     if (mListener != null) mListener.didRespond(This, Define.EVENT_DONE, null);
                 } else if (event.equals(Define.LOADING) && data == null) {
 //                    showFragmentLoading();
@@ -227,10 +250,21 @@ public class FragmentBusStation extends Fragment {
 //            }
 //        });
 //    }
-//
-
 
     private void updateBusStationList() {
+    }
+
+    public String createSaveData() {
+        ArrayList<BusStation> mmTempBusStopList = AppData.GetInstance().mBusStationList;
+        return SaveManagerBusStation.GetInstance().saveBusStationData(mmTempBusStopList);
+    }
+
+    private void saveByPreference(String data) {
+        SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = mPref.edit();
+        editor.putString("busStationInfo", data);
+        editor.commit();
+        Timber.d("saved!");
     }
 
     public void removeFragment(Fragment fragment) {
@@ -247,7 +281,5 @@ public class FragmentBusStation extends Fragment {
 
     public interface Listener {
         public void didRespond(Fragment fragment, String event, HashMap<String, String> data);
-
     }
-
 }

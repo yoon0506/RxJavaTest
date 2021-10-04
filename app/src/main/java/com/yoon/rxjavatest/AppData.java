@@ -51,9 +51,6 @@ public class AppData {
         return mmEdt.commit();
     }
 
-    // 네이버 맵을 작동할때만 임시로 trustManager를 넘기는 boolean.
-    public boolean mIsNaverMapOn = false;
-
     public String GetMessageURL(Context context) {
         SharedPreferences mmPref = context.getSharedPreferences("pref", context.MODE_PRIVATE);
         return mmPref.getString(Key.NOTIFICATION_URL, "");

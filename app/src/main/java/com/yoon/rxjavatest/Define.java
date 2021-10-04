@@ -52,6 +52,7 @@ public class Define {
     public static final String FILE_INFORM = "서비스를 실행하기 위한 데이터를 가져오는데 문제가 발생하였습니다.\n네트워크 상태를 확인하시고 다시 실행하여 주시기 바랍니다.";
     public static final String SEARCH_INFORM = "검색어를 입력하여 주십시오.";
     public static final String BUS_SEARCH_INFORM = "버스정류장 이름을 입력하여 주십시오.";
+    public static final String DELETE_BUS_STATION_INFORM = "정류장을 지우시겠습니까?";
 
     public static final String NOTIFY_TITLE = "알림";
     public static final String CONFIRM_MSG = "확인";

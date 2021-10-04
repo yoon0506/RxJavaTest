@@ -170,7 +170,6 @@ public class FragmentBus extends Fragment {
                             });
                         }
                     });
-                    AppData.GetInstance().mIsNaverMapOn = false;
                 } else if (event.equals(Define.EVENT_DONE) && data == null) {
                     // 버스 추가
                     saveByPreference(createSaveData());
@@ -186,7 +185,6 @@ public class FragmentBus extends Fragment {
                         }
                     });
                     removeFragment(mFragmentMap);
-                    AppData.GetInstance().mIsNaverMapOn = false;
                     if (mListener != null) mListener.didRespond(This, Define.EVENT_DONE, null);
                 } else if (event.equals(Define.LOADING) && data == null) {
 //                        showFragmentLoading();

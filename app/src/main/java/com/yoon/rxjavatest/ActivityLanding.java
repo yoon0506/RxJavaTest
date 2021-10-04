@@ -10,9 +10,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 
 import com.opencsv.CSVParserBuilder;
@@ -20,8 +22,11 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.yoon.rxjavatest._Library._Popup;
 import com.yoon.rxjavatest._Library._Yoon._Internet;
+import com.yoon.rxjavatest.busData.BusStation;
+import com.yoon.rxjavatest.busData.BusStationDetail;
 import com.yoon.rxjavatest.busData.BusStop;
 import com.yoon.rxjavatest.busData.BusStopFromCSV;
+import com.yoon.rxjavatest.busData.SaveManagerBusStation;
 import com.yoon.rxjavatest.databinding.ActivityLandingBinding;
 
 import java.io.BufferedReader;
@@ -53,20 +58,6 @@ public class ActivityLanding extends AppCompatActivity {
     private ArrayList<HashMap<String, String>> mBusStationInfo = new ArrayList<HashMap<String, String>>();
 
     private String mBusStopInfoFileName = "bus_stop_info.csv";
-    
-    // 버스 타임라인에서 선택한 정류장의 데이터
-    private BusStop mBusStopData;
-    private ArrayList<BusStop> mBusStopList = new ArrayList<>();
-    // 선택된 버스 정류소 정보
-    protected String mBusRouteNum = null;
-    protected String mBusNodeNum = null;
-    protected String mBusRouteId = null;
-    protected String mBusNodeName = null;
-    protected String mBusNodeId = null;
-    protected String mBusRouteTp = null;
-    protected String mBusStartStopName = null;
-    protected String mBusEndStopName = null;
-    protected String mBusNextBusStop = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +77,7 @@ public class ActivityLanding extends AppCompatActivity {
                         getBusStationInfoFromCSV();
                         // 정류장 구현 후 설정할것
                         // 저장된 데이터 불러옴
-//                        loadSavedData();
+                        loadSavedData();
                     }
                 } else {  // 인터넷 연결 x
                     _Popup.GetInstance().ShowConfirmPopup(This, Define.NOTIFY_TITLE, Define.NETWORK_INFORM, Define.CONFIRM_MSG, new _Popup.ConfirmPopupListener() {
@@ -223,40 +214,19 @@ public class ActivityLanding extends AppCompatActivity {
         }
     }
 
-
-    private int mCntData = 0;
-    // 사용자가 저장한 버스 정류장의 개수
-    private int mTotalCnt = 0;
-
     private void loadSavedData() {
-//        SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(This);
-//        String savedData = mPref.getString("busDataList", "");
-//        if (savedData == null || savedData.equals("") || savedData.equals("{}")) {
-//            loadSavedNotiBusData();
-//        } else {
-//            SaveManagerBusList.GetInstance().setListener(new SaveManagerBusList.Listener() {
-//                @Override
-//                public void didRespond(String event, ArrayList<BusStop> data) {
-//                    if (event.equals(Define.LOAD_DATA) && data != null) {
-//                        AppData.GetInstance().SetBusStopList(data);
-//                        mTotalCnt = data.size();
-//                        if (mCntData < mTotalCnt) {
-//                            mBusRouteNum = data.get(mCntData).getBusNum();
-//                            mBusNodeNum = data.get(mCntData).getBusStopNumber();
-//                            mBusRouteId = data.get(mCntData).getRouteId();
-//                            mBusNodeName = data.get(mCntData).getBusStopName();
-//                            mBusNodeId = data.get(mCntData).getNodeId();
-//                            mBusRouteTp = data.get(mCntData).getRoutetp();
-//                            mBusStartStopName = data.get(mCntData).getFinalStartBusStop();
-//                            mBusEndStopName = data.get(mCntData).getFinalEndBusStop();
-//                            mBusNextBusStop = data.get(mCntData).getNextBusStop();
-//                            requestBusRouteInfo();
-//                        }
-//                    }
-//                }
-//            });
-//            SaveManagerBusList.GetInstance().loadData(savedData);
-//        }
+        SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(This);
+        String savedData = mPref.getString("busStationInfo", "");
+        if (savedData == null || savedData.equals("") || savedData.equals("{}")) {
+
+        } else {
+            SaveManagerBusStation.GetInstance().setListener((event, data) -> {
+                if (event.equals(Define.LOAD_DATA) && data != null) {
+                    AppData.GetInstance().SetBusStationList(data);
+                }
+            });
+            SaveManagerBusStation.GetInstance().loadData(savedData);
+        }
     }
 
 
