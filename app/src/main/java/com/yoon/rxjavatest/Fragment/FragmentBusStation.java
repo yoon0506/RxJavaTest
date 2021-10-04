@@ -17,7 +17,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.yoon.rxjavatest.Adapter.AdapterBusStationDetail;
+import com.yoon.rxjavatest.Adapter.AdapterBusStation;
 import com.yoon.rxjavatest.Api.Example;
 import com.yoon.rxjavatest.Api.Item;
 import com.yoon.rxjavatest.AppData;
@@ -52,9 +52,9 @@ public class FragmentBusStation extends Fragment {
     // UI
     private View mFooterView;
     private ImageView mAddBusBtn;
-//    private AdapterBusStation mAdapterBusStation
 
-    private AdapterBusStationDetail mAdapterBusStation;
+    // adapter
+    private AdapterBusStation mAdapterBusStation;
 
     // rxJava
     private Disposable mDisposable;
@@ -62,7 +62,6 @@ public class FragmentBusStation extends Fragment {
 
     // bus
     private ArrayList<BusStation> mBusStationList = new ArrayList<>(AppData.GetInstance().mBusStationList);
-    private ArrayList<BusStationDetail> mBusStationDetailList = new ArrayList<>(AppData.GetInstance().mBusStationDetailList);
     private static final String ROWS = "300";
 
     private Listener mListener = null;
@@ -83,22 +82,22 @@ public class FragmentBusStation extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         try {
-            mAdapterBusStation = new AdapterBusStationDetail(getContext(), mBusStationDetailList);
+            mAdapterBusStation = new AdapterBusStation(getContext(), mBusStationList);
             mBinding.timeLineListView.setAdapter(mAdapterBusStation);
             mBinding.timeLineListView.setLayoutManager(new LinearLayoutManager(getContext()));
             mAdapterBusStation.SetListener(busData -> {
                 if (busData != null) {
-                    _Popup.GetInstance().ShowBinaryPopup(getContext(), busData.get(Key.BUS_NODE_NAME) + " " +Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
+                    _Popup.GetInstance().ShowBinaryPopup(getContext(), busData.get(Key.BUS_NODE_NAME) + " " + Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
                             (mainMessage, selectMessage) -> {
                                 if (selectMessage.equals("확인")) {
-                                    for (BusStationDetail data : mBusStationDetailList) {
-                                        if (data.getNodeId().equals(busData.get(Key.BUS_NODE_ID))) {
+                                    for (BusStation data : mBusStationList) {
+                                        if (data.getBusNodeId().equals(busData.get(Key.BUS_NODE_ID))) {
                                             AppData.GetInstance().mBusStationDetailList.remove(data);
                                         }
                                     }
 
                                     // 임시.. mBusStationList와 mBusStationDetailList 통합 필요
-                                    for(BusStation data: mBusStationList){
+                                    for (BusStation data : mBusStationList) {
                                         if (busData.get(Key.BUS_NODE_ID).contains(data.getBusNodeId())) {
                                             AppData.GetInstance().mBusStationList.remove(data);
                                         }
@@ -137,13 +136,26 @@ public class FragmentBusStation extends Fragment {
                                            public void onNext(@NonNull Example strings) {
                                                Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
                                                List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+                                               ArrayList<BusStationDetail> mmBusStationDetailList = new ArrayList<>();
+                                               String mmBusStationDetailNodeId = "";
                                                for (Item data : busData) {
                                                    BusStationDetail detailData = new BusStationDetail(data.getArrprevstationcnt() + "", data.getArrtime() + "", data.getNodeid(), data.getNodenm(), data.getRouteid(), data.getRouteno(), data.getRoutetp());
-                                                   mBusStationDetailList.add(detailData);
+                                                   mmBusStationDetailNodeId = detailData.getNodeId();
+                                                   mmBusStationDetailList.add(detailData);
                                                }
+
+                                               for (BusStation busStationData : mBusStationList) {
+                                                   if (mmBusStationDetailNodeId.contains(busStationData.getBusNodeId())) {
+                                                       busStationData.setArrivalBusInfo(mmBusStationDetailList);
+                                                   }
+                                               }
+
+                                               // 버스 정류장 데이터 갱신
+                                               AppData.GetInstance().SetBusStationList(mBusStationList);
+
 //                                               Item busData = strings.getResponse().getBody().getItems().getItem();
 //                                               BusStationDetail detailData = new BusStationDetail(busData.getArrprevstationcnt() + "", busData.getArrtime() + "", busData.getNodeid(), busData.getNodenm(), busData.getRouteid(), busData.getRouteno(), busData.getRoutetp());
-//                                               mBusStationDetailList.add(detailData);
+//                                               mmBusStationDetailList.add(detailData);
                                                if (mAdapterBusStation != null) {
                                                    mAdapterBusStation.notifyDataSetChanged();
                                                    mBinding.timeLineListView.setAdapter(mAdapterBusStation);

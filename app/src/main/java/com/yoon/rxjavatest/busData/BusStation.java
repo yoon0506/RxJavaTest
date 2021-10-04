@@ -7,7 +7,7 @@ public class BusStation {
     private String busNodeName;
     private String busNodeNo;
     private String busNextStopName;
-    private ArrayList<BusStationDetail> arrivalBusInfo;
+    private ArrayList<BusStationDetail> arrivalBusInfo = new ArrayList<>();
 
     public BusStation(){}
 

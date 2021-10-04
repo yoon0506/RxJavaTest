@@ -1,86 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
-        android:id="@+id/busArriveInfoContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingTop="10dp">
+        android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/busInfoCell"
+        <LinearLayout
+            android:id="@+id/busArriveInfoContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:orientation="horizontal">
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="10dp">
 
-            <TextView
-                android:id="@+id/busNum_stop"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:id="@+id/busInfoCell"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/rounded_corner_yellow_fill"
-                android:fontFamily="@font/nanum_square_b"
-                android:gravity="center"
-                android:paddingLeft="20dp"
-                android:paddingTop="5dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="5dp"
-                android:text="버스번호"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="22sp" />
+                android:layout_gravity="center"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/arrivedInfo_stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical"
-                android:layout_toLeftOf="@+id/arrivedInfoTxt_stop"
-                android:fontFamily="@font/nanum_square_b"
-                android:text="24"
-                android:textAlignment="center"
-                android:textColor="@color/green"
-                android:textSize="22sp" />
+                <TextView
+                    android:id="@+id/busNum_stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/rounded_corner_yellow_fill"
+                    android:fontFamily="@font/nanum_square_b"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="5dp"
+                    android:text="버스번호"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="22sp" />
 
-            <TextView
-                android:id="@+id/arrivedInfoTxt_stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical"
-                android:text="번째 전"
-                android:textColor="@color/green"
-                android:textSize="18sp" />
+                <TextView
+                    android:id="@+id/arrivedInfo_stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_toLeftOf="@+id/arrivedInfoTxt_stop"
+                    android:fontFamily="@font/nanum_square_b"
+                    android:text="24"
+                    android:textAlignment="center"
+                    android:textColor="@color/green"
+                    android:textSize="22sp" />
 
-            <TextView
-                android:id="@+id/arrivedSoonTxt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:visibility="gone"
-                android:text="잠시 후 도착"
-                android:textColor="@color/gray_arrivedSoon"
-                android:textSize="18sp" />
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/arrivedInfoTxt_stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:text="번째 전"
+                    android:textColor="@color/green"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/arrivedSoonTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:text="잠시 후 도착"
+                    android:textColor="@color/gray_arrivedSoon"
+                    android:textSize="18sp"
+                    android:visibility="gone" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- 리스트 아래 여백 추가 -->
+        <RelativeLayout
+            android:id="@+id/marginBottom"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginBottom="5dp"
+            android:visibility="gone" />
     </LinearLayout>
 
-    <!-- 리스트 아래 여백 추가 -->
-    <RelativeLayout
-        android:id="@+id/marginBottom"
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_marginBottom="5dp"
-        android:visibility="gone" />
-</LinearLayout>
+</layout>
