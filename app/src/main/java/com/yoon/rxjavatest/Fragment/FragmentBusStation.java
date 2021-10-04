@@ -85,25 +85,33 @@ public class FragmentBusStation extends Fragment {
             mAdapterBusStation = new AdapterBusStation(getContext(), mBusStationList);
             mBinding.timeLineListView.setAdapter(mAdapterBusStation);
             mBinding.timeLineListView.setLayoutManager(new LinearLayoutManager(getContext()));
-            mAdapterBusStation.SetListener(busData -> {
-                if (busData != null) {
-                    _Popup.GetInstance().ShowBinaryPopup(getContext(), busData.get(Key.BUS_NODE_NAME) + " " + Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
-                            (mainMessage, selectMessage) -> {
-                                if (selectMessage.equals("확인")) {
-                                    for (BusStation data : mBusStationList) {
-                                        if (data.getBusNodeId().equals(busData.get(Key.BUS_NODE_ID))) {
-                                            AppData.GetInstance().mBusStationDetailList.remove(data);
-                                        }
-                                    }
+            mAdapterBusStation.SetListener(new AdapterBusStation.Listener() {
+                @Override
+                public void addBusStation() {
+                    showFragmentMapBusStation();
+                }
 
-                                    // 임시.. mBusStationList와 mBusStationDetailList 통합 필요
-                                    for (BusStation data : mBusStationList) {
-                                        if (busData.get(Key.BUS_NODE_ID).contains(data.getBusNodeId())) {
-                                            AppData.GetInstance().mBusStationList.remove(data);
+                @Override
+                public void eventRemoveItem(HashMap<String, String> busData) {
+                    if (busData != null) {
+                        _Popup.GetInstance().ShowBinaryPopup(getContext(), busData.get(Key.BUS_NODE_NAME) + " " + Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
+                                (mainMessage, selectMessage) -> {
+                                    if (selectMessage.equals("확인")) {
+                                        for (BusStation data : mBusStationList) {
+                                            if (data.getBusNodeId().equals(busData.get(Key.BUS_NODE_ID))) {
+                                                AppData.GetInstance().mBusStationDetailList.remove(data);
+                                            }
+                                        }
+
+                                        // 임시.. mBusStationList와 mBusStationDetailList 통합 필요
+                                        for (BusStation data : mBusStationList) {
+                                            if (busData.get(Key.BUS_NODE_ID).contains(data.getBusNodeId())) {
+                                                AppData.GetInstance().mBusStationList.remove(data);
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
+                    }
                 }
             });
             // 새로고침 버튼
@@ -114,9 +122,8 @@ public class FragmentBusStation extends Fragment {
                     String mmNodeId = "CCB" + data.getBusNodeId();
                     rxArvlInfoInquireService(mmNodeId);
                 }
-
             } else {
-                setAdapter();
+//                setAdapter();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -186,13 +193,10 @@ public class FragmentBusStation extends Fragment {
                 // 버스 추가 더하기 버튼
                 mAddBusBtn = mFooterView.findViewById(R.id.addBusBtn);
             } else {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mBinding.busAddInfo.setVisibility(View.VISIBLE);
-                        // 버스 추가 더하기 버튼
-                        mAddBusBtn = mBinding.addBusBtn;
-                    }
+                getActivity().runOnUiThread(() -> {
+                    mBinding.busAddInfo.setVisibility(View.VISIBLE);
+                    // 버스 추가 더하기 버튼
+                    mAddBusBtn = mBinding.addBusBtn;
                 });
             }
             mAddBusBtn.setOnClickListener(v -> showFragmentMapBusStation());
