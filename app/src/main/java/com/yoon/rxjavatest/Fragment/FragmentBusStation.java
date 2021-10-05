@@ -37,6 +37,7 @@ import com.yoon.rxjavatest.databinding.FragmentBusStationBinding;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
@@ -90,6 +91,11 @@ public class FragmentBusStation extends Fragment {
             mBinding.timeLineListView.setAdapter(mAdapterBusStation);
             mBinding.timeLineListView.setLayoutManager(new LinearLayoutManager(getContext()));
             mAdapterBusStation.updateItems(mBusStationList);
+            // add btn event
+            mAdapterBusStation.setListener(() -> {
+                showFragmentMapBusStation();
+            });
+            // long click event
             mAdapterBusStation.getItemPublishSubject()
                     .subscribe(busStation -> {
                         _Popup.GetInstance().ShowBinaryPopup(getContext(), busStation.getBusNodeName() + " " + Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
@@ -100,8 +106,6 @@ public class FragmentBusStation extends Fragment {
                                                 AppData.GetInstance().mBusStationDetailList.remove(data);
                                             }
                                         }
-
-                                        // 임시.. mBusStationList와 mBusStationDetailList 통합 필요
                                         for (BusStation data : mBusStationList) {
                                             if (busStation.getBusNodeId().contains(data.getBusNodeId())) {
                                                 AppData.GetInstance().mBusStationList.remove(data);
@@ -111,18 +115,6 @@ public class FragmentBusStation extends Fragment {
                                 });
                     });
 
-//                    .SetListener(new AdapterBusStation.Listener() {
-//                @Override
-//                public void addBusStation() {
-//                    showFragmentMapBusStation();
-//                }
-//
-//                @Override
-//                public void eventRemoveItem(BusStop busStopData) {
-//                    if (busStopData != null) {
-//
-//                    }
-//                }
             // 새로고침 버튼
             mBinding.updateBtn.setOnClickListener(v -> updateBusStationList());
             // 서버로부터 도착 정보 받아옴
@@ -131,20 +123,18 @@ public class FragmentBusStation extends Fragment {
                     String mmNodeId = "CCB" + data.getBusNodeId();
                     rxArvlInfoInquireService(mmNodeId);
                 }
-            } else {
-//                setAdapter();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private Observable<ArrayList<BusStation>> getBusStationItemObservable(Example strings){
+    private Observable<ArrayList<BusStation>> getBusStationItemObservable(Example strings) {
         return Observable.fromIterable(mBusStationList)
 //                .sorted()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .map(item->{
+                .map(item -> {
                     Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
                     List<Item> busData = strings.getResponse().getBody().getItems().getItem();
                     ArrayList<BusStationDetail> mmBusStationDetailList = new ArrayList<>();
@@ -170,7 +160,11 @@ public class FragmentBusStation extends Fragment {
 
         mCompositeDisposable = new CompositeDisposable();
         mCompositeDisposable.add(
-                mmObservable.subscribeOn(Schedulers.io())
+                // 10초 마다 반복.
+                mmObservable.interval(10000, TimeUnit.MILLISECONDS)
+                        .flatMap(n -> mmObservable)
+                        .repeat()
+                        .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableObserver<Example>() {
                                            @SuppressLint("CheckResult")
@@ -183,7 +177,7 @@ public class FragmentBusStation extends Fragment {
                                                if (mAdapterBusStation != null) {
                                                    getBusStationItemObservable(strings)
                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                           .subscribe(item->{
+                                                           .subscribe(item -> {
                                                                mAdapterBusStation.updateItems(item);
                                                                mAdapterBusStation.notifyDataSetChanged();
                                                            });
@@ -201,35 +195,9 @@ public class FragmentBusStation extends Fragment {
 
                                            @Override
                                            public void onComplete() {
-
                                            }
-
                                        }
                         ));
-    }
-
-
-
-    private void setAdapter() {
-        try {
-            mFooterView = getLayoutInflater().inflate(R.layout.bus_list_view_footer, null, false);
-            mFooterView.setTag("footer");
-            // 등록된 버스가 1개 이상 있으면
-            if (mBusStationList.size() > 0) {
-                mBinding.timeLineListView.addView(mFooterView);
-                // 버스 추가 더하기 버튼
-                mAddBusBtn = mFooterView.findViewById(R.id.addBusBtn);
-            } else {
-                getActivity().runOnUiThread(() -> {
-                    mBinding.busAddInfo.setVisibility(View.VISIBLE);
-                    // 버스 추가 더하기 버튼
-                    mAddBusBtn = mBinding.addBusBtn;
-                });
-            }
-            mAddBusBtn.setOnClickListener(v -> showFragmentMapBusStation());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void showFragmentMapBusStation() {

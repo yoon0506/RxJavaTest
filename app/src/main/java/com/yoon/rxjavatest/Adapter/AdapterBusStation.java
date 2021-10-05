@@ -42,20 +42,11 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
     // 도착예정인 버스 정보 노출 수.
     private static final int SHOW_BUS_COUNT = 5;
 
-    private Listener mListener;
-
-    public void SetListener(Listener listener) {
-        mListener = listener;
-    }
-
     // rxjava
     private PublishSubject<BusStation> mPublishSubject;
+    // listener
+    private Listener mListener;
 
-//    public AdapterBusStation(Context mContext, ArrayList<BusStation> mBusStationList) {
-//        this.mPublishSubject = PublishSubject.create();
-//        this.mContext = mContext;
-//        this.mBusStationList = mBusStationList;
-//    }
     public AdapterBusStation(Context mContext) {
         this.mPublishSubject = PublishSubject.create();
         this.mContext = mContext;
@@ -219,10 +210,12 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
         mBusStationList.addAll(busData);
     }
 
+    public void setListener(Listener listener){
+        mListener = listener;
+    }
+
     public interface Listener {
         public void addBusStation();
-
-        public void eventRemoveItem(BusStop busStopData);
     }
 
     public PublishSubject<BusStation> getItemPublishSubject() {
