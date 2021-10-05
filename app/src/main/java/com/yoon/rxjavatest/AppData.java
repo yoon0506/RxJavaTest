@@ -257,17 +257,6 @@ public class AppData {
 //        return mPushDataList;
 //    }
 
-    @SuppressLint("MissingPermission")
-    public boolean CheckInternetConnection(Context context) {
-
-        ConnectivityManager con_manager = (ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        return (con_manager.getActiveNetworkInfo() != null
-                && con_manager.getActiveNetworkInfo().isAvailable()
-                && con_manager.getActiveNetworkInfo().isConnected());
-    }
-
     public InputStream readFromAssets(String filename) throws Exception {
         InputStream caInput = mActivity.getAssets().open(filename);
         return caInput;

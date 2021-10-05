@@ -1,6 +1,8 @@
 package com.yoon.rxjavatest.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -28,6 +30,7 @@ import com.yoon.rxjavatest.Request.RxArvlInfoInquireService;
 import com.yoon.rxjavatest._Library._Popup;
 import com.yoon.rxjavatest.busData.BusStation;
 import com.yoon.rxjavatest.busData.BusStationDetail;
+import com.yoon.rxjavatest.busData.BusStop;
 import com.yoon.rxjavatest.busData.SaveManagerBusStation;
 import com.yoon.rxjavatest.databinding.FragmentBusStationBinding;
 
@@ -36,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -62,6 +66,7 @@ public class FragmentBusStation extends Fragment {
 
     // bus
     private ArrayList<BusStation> mBusStationList = new ArrayList<>(AppData.GetInstance().mBusStationList);
+//    private ArrayList<BusStation> mBusStationList = new ArrayList<>();
 
     private Listener mListener = null;
 
@@ -81,38 +86,43 @@ public class FragmentBusStation extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         try {
-            mAdapterBusStation = new AdapterBusStation(getContext(), mBusStationList);
+            mAdapterBusStation = new AdapterBusStation(getContext());
             mBinding.timeLineListView.setAdapter(mAdapterBusStation);
             mBinding.timeLineListView.setLayoutManager(new LinearLayoutManager(getContext()));
-            mAdapterBusStation.SetListener(new AdapterBusStation.Listener() {
-                @Override
-                public void addBusStation() {
-                    showFragmentMapBusStation();
-                }
-
-                @Override
-                public void eventRemoveItem(HashMap<String, String> busData) {
-                    if (busData != null) {
-                        _Popup.GetInstance().ShowBinaryPopup(getContext(), busData.get(Key.BUS_NODE_NAME) + " " + Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
+            mAdapterBusStation.updateItems(mBusStationList);
+            mAdapterBusStation.getItemPublishSubject()
+                    .subscribe(busStation -> {
+                        _Popup.GetInstance().ShowBinaryPopup(getContext(), busStation.getBusNodeName() + " " + Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
                                 (mainMessage, selectMessage) -> {
                                     if (selectMessage.equals("확인")) {
                                         for (BusStation data : mBusStationList) {
-                                            if (data.getBusNodeId().equals(busData.get(Key.BUS_NODE_ID))) {
+                                            if (data.getBusNodeId().equals(busStation.getBusNodeId())) {
                                                 AppData.GetInstance().mBusStationDetailList.remove(data);
                                             }
                                         }
 
                                         // 임시.. mBusStationList와 mBusStationDetailList 통합 필요
                                         for (BusStation data : mBusStationList) {
-                                            if (busData.get(Key.BUS_NODE_ID).contains(data.getBusNodeId())) {
+                                            if (busStation.getBusNodeId().contains(data.getBusNodeId())) {
                                                 AppData.GetInstance().mBusStationList.remove(data);
                                             }
                                         }
                                     }
                                 });
-                    }
-                }
-            });
+                    });
+
+//                    .SetListener(new AdapterBusStation.Listener() {
+//                @Override
+//                public void addBusStation() {
+//                    showFragmentMapBusStation();
+//                }
+//
+//                @Override
+//                public void eventRemoveItem(BusStop busStopData) {
+//                    if (busStopData != null) {
+//
+//                    }
+//                }
             // 새로고침 버튼
             mBinding.updateBtn.setOnClickListener(v -> updateBusStationList());
             // 서버로부터 도착 정보 받아옴
@@ -129,6 +139,31 @@ public class FragmentBusStation extends Fragment {
         }
     }
 
+    private Observable<ArrayList<BusStation>> getBusStationItemObservable(Example strings){
+        return Observable.fromIterable(mBusStationList)
+//                .sorted()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .map(item->{
+                    Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
+                    List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+                    ArrayList<BusStationDetail> mmBusStationDetailList = new ArrayList<>();
+                    String mmBusStationDetailNodeId = "";
+                    for (Item data : busData) {
+                        BusStationDetail detailData = new BusStationDetail(data.getArrprevstationcnt() + "", data.getArrtime() + "", data.getNodeid(), data.getNodenm(), data.getRouteid(), data.getRouteno(), data.getRoutetp());
+                        mmBusStationDetailNodeId = detailData.getNodeId();
+                        mmBusStationDetailList.add(detailData);
+                    }
+
+                    for (BusStation busStationData : mBusStationList) {
+                        if (mmBusStationDetailNodeId.contains(busStationData.getBusNodeId())) {
+                            busStationData.setArrivalBusInfo(mmBusStationDetailList);
+                        }
+                    }
+                    return mBusStationList;
+                });
+    }
+
     private void rxArvlInfoInquireService(String mmNodeId) {
         RxArvlInfoInquireService.BusArvlInfo mmService = RxArvlInfoInquireService.getInstance().getServiceAPI();
         Observable<Example> mmObservable = mmService.getObArvlInfo(Key.SERVICE_KEY, Key.CITY_CODE, mmNodeId, Key.ROWS, Key.TYPE_JSON);
@@ -138,33 +173,24 @@ public class FragmentBusStation extends Fragment {
                 mmObservable.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableObserver<Example>() {
+                                           @SuppressLint("CheckResult")
                                            @Override
                                            public void onNext(@NonNull Example strings) {
-                                               Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
-                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
-                                               ArrayList<BusStationDetail> mmBusStationDetailList = new ArrayList<>();
-                                               String mmBusStationDetailNodeId = "";
-                                               for (Item data : busData) {
-                                                   BusStationDetail detailData = new BusStationDetail(data.getArrprevstationcnt() + "", data.getArrtime() + "", data.getNodeid(), data.getNodenm(), data.getRouteid(), data.getRouteno(), data.getRoutetp());
-                                                   mmBusStationDetailNodeId = detailData.getNodeId();
-                                                   mmBusStationDetailList.add(detailData);
-                                               }
-
-                                               for (BusStation busStationData : mBusStationList) {
-                                                   if (mmBusStationDetailNodeId.contains(busStationData.getBusNodeId())) {
-                                                       busStationData.setArrivalBusInfo(mmBusStationDetailList);
-                                                   }
-                                               }
-
-                                               // 버스 정류장 데이터 갱신
-                                               AppData.GetInstance().SetBusStationList(mBusStationList);
-
 //                                               Item busData = strings.getResponse().getBody().getItems().getItem();
 //                                               BusStationDetail detailData = new BusStationDetail(busData.getArrprevstationcnt() + "", busData.getArrtime() + "", busData.getNodeid(), busData.getNodenm(), busData.getRouteid(), busData.getRouteno(), busData.getRoutetp());
 //                                               mmBusStationDetailList.add(detailData);
+
                                                if (mAdapterBusStation != null) {
-                                                   mAdapterBusStation.notifyDataSetChanged();
-                                                   mBinding.timeLineListView.setAdapter(mAdapterBusStation);
+                                                   getBusStationItemObservable(strings)
+                                                           .observeOn(AndroidSchedulers.mainThread())
+                                                           .subscribe(item->{
+                                                               mAdapterBusStation.updateItems(item);
+                                                               mAdapterBusStation.notifyDataSetChanged();
+                                                           });
+
+                                                   // 버스 정류장 데이터 갱신
+                                                   AppData.GetInstance().SetBusStationList(mBusStationList);
+//                                                   mBinding.timeLineListView.setAdapter(mAdapterBusStation);
                                                }
                                            }
 
@@ -181,6 +207,8 @@ public class FragmentBusStation extends Fragment {
                                        }
                         ));
     }
+
+
 
     private void setAdapter() {
         try {

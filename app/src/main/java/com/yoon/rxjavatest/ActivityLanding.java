@@ -21,21 +21,14 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.yoon.rxjavatest._Library._Popup;
-import com.yoon.rxjavatest._Library._Yoon._Internet;
-import com.yoon.rxjavatest.busData.BusStation;
-import com.yoon.rxjavatest.busData.BusStationDetail;
-import com.yoon.rxjavatest.busData.BusStop;
+import com.yoon.rxjavatest._Library._Yoon._InternetConnectionCheck;
 import com.yoon.rxjavatest.busData.BusStopFromCSV;
 import com.yoon.rxjavatest.busData.SaveManagerBusStation;
 import com.yoon.rxjavatest.databinding.ActivityLandingBinding;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Timed;
 import timber.log.Timber;
 
 public class ActivityLanding extends AppCompatActivity {
@@ -65,10 +57,10 @@ public class ActivityLanding extends AppCompatActivity {
         mBinding = DataBindingUtil.setContentView(This, R.layout.activity_landing);
         Timber.plant(new Timber.DebugTree());
 
-        _Internet.GetInstance().getConnectivityStatus(getApplication(), new _Internet.Listener() {
+        _InternetConnectionCheck.GetInstance().getConnectivityStatus(getApplication(), new _InternetConnectionCheck.Listener() {
             @Override
             public void result(int result) {
-                if (result == _Internet.GetInstance().TYPE_CONNECTED) { //인터넷 연결 o
+                if (result == _InternetConnectionCheck.GetInstance().TYPE_CONNECTED) { //인터넷 연결 o
                     //퍼미션 상태 확인
                     if (!hasPermissions(PERMISSIONS)) {
                         //퍼미션 허가 안되어있다면 사용자에게 요청

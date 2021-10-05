@@ -99,12 +99,7 @@ public class FragmentBus extends Fragment {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe();
             // 새로고침 버튼
-            mBinding.updateBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    updateBusList();
-                }
-            });
+            mBinding.updateBtn.setOnClickListener(v -> updateBusList());
             mFirstVisiblePosition = 0;
 
             //test
@@ -135,10 +130,7 @@ public class FragmentBus extends Fragment {
         }
     }
 
-    //
     private void showFragmentMap() {
-        Timber.tag("checkCheck").d("map map map map map map ");
-
         if (mFragmentMap != null) {
             removeFragment(mFragmentMap);
         }

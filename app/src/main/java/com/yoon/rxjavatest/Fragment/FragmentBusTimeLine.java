@@ -23,7 +23,7 @@ public class FragmentBusTimeLine extends Fragment {
     private FragmentBusTimeLine This = this;
     private FragmentBusTimeLineBinding mBinding;
     // request
-    private RequestRouteAcctoBusList mRequestRouteAcctoBusList;
+//    private RequestRouteAcctoBusList mRequestRouteAcctoBusList;
 //    // UI
 //    private ListView mBinding.listViewBusTimeLine;
 //

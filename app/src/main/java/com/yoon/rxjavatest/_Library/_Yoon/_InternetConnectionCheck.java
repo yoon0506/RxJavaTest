@@ -5,17 +5,14 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-public class _Internet {
+public class _InternetConnectionCheck {
 
-
-    private static _Internet instance = new _Internet();
-
-    public static _Internet GetInstance() {
+    private static _InternetConnectionCheck instance = new _InternetConnectionCheck();
+    public static _InternetConnectionCheck GetInstance() {
         return instance;
     }
 
     private Listener mListener;
-
     public void SetListener(Listener listener) {
         mListener = listener;
     }

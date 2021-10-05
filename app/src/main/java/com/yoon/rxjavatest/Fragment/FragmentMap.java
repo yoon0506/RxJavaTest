@@ -452,11 +452,9 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
                                                    BusStationDetail detailData = new BusStationDetail(data.getArrprevstationcnt() + "", data.getArrtime() + "", data.getNodeid(), data.getNodenm(), data.getRouteid(), data.getRouteno(), data.getRoutetp());
                                                    mmBusStationDetailList.add(detailData);
                                                }
-                                               
 //                                               Item busData = strings.getResponse().getBody().getItems().getItem();
 //                                               BusStationDetail detailData = new BusStationDetail(busData.getArrprevstationcnt() + "", busData.getArrtime() + "", busData.getNodeid(), busData.getNodenm(), busData.getRouteid(), busData.getRouteno(), busData.getRoutetp());
 //                                               mmBusStationDetailList.add(detailData);
-
                                            }
 
                                            @Override
@@ -475,77 +473,77 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
 
     // 1. "버스 노선 조회 서비스"의 "노선번호목록조회" 기능으로 버스 번호를 입력해 해당 버스 번호(노선 번호의) 출발점, 종점 정류소 데이터를 얻는다.
     private void requestBusInformation(String routeNo) {
-        mRequestBusInformation = new RequestBusInformation();
-        mRequestBusInformation.request(routeNo, new RequestBusInformation.Listener() {
-            @Override
-            public void didRespond(ArrayList<HashMap<String, String>> data, String error) {
-                if (error.equals("0") && data != null) {
-                    if (mBusNumInfo.size() > 0) {
-                        mBusNumInfo.clear();
-                        mBusNumInfo = null;
-                        mBusNumInfo = new ArrayList<>();
-                    }
-                    mBusNumInfo = data;
-
-                    for (int i = 0; i < mBusNumInfo.size(); i++) {
-                        if (mBusNumInfo.get(i).get(Key.BUS_ROUTE_ID).equals(mBusRouteId)) {
-                            mBusNumInfo.get(i).put(Key.BUS_NODE_NAME, mBusNodeName);
-                            mBusNumInfo.get(i).put(Key.BUS_NEXT_STOP, mBusNextStop);
-
-                            BusSelection mmBusSelectionData = new BusSelection(mBusNumInfo.get(i));
-                            mBusSelectionDataList.add(mmBusSelectionData);
-                        }
-                    }
-
-                    mDataCnt++;
-
-                    if (mDataCnt < mTotalDataCnt) {
-                        mBusRouteId = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_ID);
-                        String mmBusRouteNo = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_NO);
-                        mBusNextStop = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_NEXT_STOP);
-                        requestBusInformation(mmBusRouteNo);
-                    } else {
-                        mDataCnt = 0;
-                        if (AppData.GetInstance().mBusSelectionDataList.size() > 0) {
-                            AppData.GetInstance().mBusSelectionDataList.clear();
-                            AppData.GetInstance().mBusSelectionDataList = null;
-                        }
-                        AppData.GetInstance().SetBusSelectionDataList(mBusSelectionDataList);
-                        showFragmentBusSelection();
-                        mIsRequestData = false;
-
-                        if (mListener != null) {
-//                            mIsSuccLoading = true;
-                            mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-                        }
-                    }
-                } else if (error.equals("-1") && data == null) {
-                    mDataCnt++;
-
-                    if (mDataCnt < mTotalDataCnt) {
-                        mBusRouteId = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_ID);
-                        String mmBusRouteNo = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_NO);
-                        mBusNextStop = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_NEXT_STOP);
-                        requestBusInformation(mmBusRouteNo);
-                    } else {
-                        mDataCnt = 0;
-                        if (AppData.GetInstance().mBusSelectionDataList.size() > 0) {
-                            AppData.GetInstance().mBusSelectionDataList.clear();
-                            AppData.GetInstance().mBusSelectionDataList = null;
-                        }
-                        AppData.GetInstance().SetBusSelectionDataList(mBusSelectionDataList);
-                        showFragmentBusSelection();
-                        mIsRequestData = false;
-                        AppData.GetInstance().SetLoadingTimer(getContext(), mTempLoadingTime);
-
-                        if (mListener != null) {
-//                            mIsSuccLoading = true;
-                            mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-                        }
-                    }
-                }
-            }
-        });
+//        mRequestBusInformation = new RequestBusInformation();
+//        mRequestBusInformation.request(routeNo, new RequestBusInformation.Listener() {
+//            @Override
+//            public void didRespond(ArrayList<HashMap<String, String>> data, String error) {
+//                if (error.equals("0") && data != null) {
+//                    if (mBusNumInfo.size() > 0) {
+//                        mBusNumInfo.clear();
+//                        mBusNumInfo = null;
+//                        mBusNumInfo = new ArrayList<>();
+//                    }
+//                    mBusNumInfo = data;
+//
+//                    for (int i = 0; i < mBusNumInfo.size(); i++) {
+//                        if (mBusNumInfo.get(i).get(Key.BUS_ROUTE_ID).equals(mBusRouteId)) {
+//                            mBusNumInfo.get(i).put(Key.BUS_NODE_NAME, mBusNodeName);
+//                            mBusNumInfo.get(i).put(Key.BUS_NEXT_STOP, mBusNextStop);
+//
+//                            BusSelection mmBusSelectionData = new BusSelection(mBusNumInfo.get(i));
+//                            mBusSelectionDataList.add(mmBusSelectionData);
+//                        }
+//                    }
+//
+//                    mDataCnt++;
+//
+//                    if (mDataCnt < mTotalDataCnt) {
+//                        mBusRouteId = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_ID);
+//                        String mmBusRouteNo = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_NO);
+//                        mBusNextStop = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_NEXT_STOP);
+//                        requestBusInformation(mmBusRouteNo);
+//                    } else {
+//                        mDataCnt = 0;
+//                        if (AppData.GetInstance().mBusSelectionDataList.size() > 0) {
+//                            AppData.GetInstance().mBusSelectionDataList.clear();
+//                            AppData.GetInstance().mBusSelectionDataList = null;
+//                        }
+//                        AppData.GetInstance().SetBusSelectionDataList(mBusSelectionDataList);
+//                        showFragmentBusSelection();
+//                        mIsRequestData = false;
+//
+//                        if (mListener != null) {
+////                            mIsSuccLoading = true;
+//                            mListener.didRespond(This, Define.LOADING_COMPLETE, null);
+//                        }
+//                    }
+//                } else if (error.equals("-1") && data == null) {
+//                    mDataCnt++;
+//
+//                    if (mDataCnt < mTotalDataCnt) {
+//                        mBusRouteId = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_ID);
+//                        String mmBusRouteNo = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_NO);
+//                        mBusNextStop = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_NEXT_STOP);
+//                        requestBusInformation(mmBusRouteNo);
+//                    } else {
+//                        mDataCnt = 0;
+//                        if (AppData.GetInstance().mBusSelectionDataList.size() > 0) {
+//                            AppData.GetInstance().mBusSelectionDataList.clear();
+//                            AppData.GetInstance().mBusSelectionDataList = null;
+//                        }
+//                        AppData.GetInstance().SetBusSelectionDataList(mBusSelectionDataList);
+//                        showFragmentBusSelection();
+//                        mIsRequestData = false;
+//                        AppData.GetInstance().SetLoadingTimer(getContext(), mTempLoadingTime);
+//
+//                        if (mListener != null) {
+////                            mIsSuccLoading = true;
+//                            mListener.didRespond(This, Define.LOADING_COMPLETE, null);
+//                        }
+//                    }
+//                }
+//            }
+//        });
     }
 
     private void showFragmentBusSelection() {

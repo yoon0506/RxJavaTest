@@ -109,7 +109,6 @@ public class AdapterBusList extends BaseAdapter {
                         mmArrivedInfo.setText(mBusStopList.get(index).getArrivedInfo()+"번째 전");
                     }
                 } else {
-                    Log.i(Define.TAG_HTTP, "arrived info is null");
 //                Toast.makeText(mContext, "arrived info is null", Toast.LENGTH_SHORT).show();
                 }
 

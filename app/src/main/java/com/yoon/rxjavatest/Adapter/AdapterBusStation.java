@@ -20,11 +20,14 @@ import com.yoon.rxjavatest.Key;
 import com.yoon.rxjavatest.R;
 import com.yoon.rxjavatest.busData.BusStation;
 import com.yoon.rxjavatest.busData.BusStationDetail;
+import com.yoon.rxjavatest.busData.BusStop;
 import com.yoon.rxjavatest.databinding.CellBusStationListBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import timber.log.Timber;
 
 public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -33,7 +36,7 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
     private static final int TYPE_FOOTER = 1;
 
     private Context mContext;
-    private ArrayList<BusStation> mBusStationList;
+    private ArrayList<BusStation> mBusStationList = new ArrayList<>();
     private BusStationViewHolder mMainHolder;
 
     // 도착예정인 버스 정보 노출 수.
@@ -45,10 +48,17 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
         mListener = listener;
     }
 
-    public AdapterBusStation(Context mContext, ArrayList<BusStation> mBusStationList) {
-        this.mContext = mContext;
-        this.mBusStationList = mBusStationList;
+    // rxjava
+    private PublishSubject<BusStation> mPublishSubject;
 
+//    public AdapterBusStation(Context mContext, ArrayList<BusStation> mBusStationList) {
+//        this.mPublishSubject = PublishSubject.create();
+//        this.mContext = mContext;
+//        this.mBusStationList = mBusStationList;
+//    }
+    public AdapterBusStation(Context mContext) {
+        this.mPublishSubject = PublishSubject.create();
+        this.mContext = mContext;
     }
 
     @NonNull
@@ -139,6 +149,8 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mainHolder.mmBinding.busLayoutContainer.addView(mmBusDetailView);
                 Timber.d("노뻐쓰");
             }
+
+            mainHolder.getLongClickObserver(mBusStationList.get(position)).subscribe(mPublishSubject);
         }
     }
 
@@ -163,18 +175,28 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
             super(itemView);
             mmBinding = DataBindingUtil.bind(itemView);
 
-            mmBinding.busStopListContainer.setOnLongClickListener(v -> {
-                int position = getAdapterPosition();
-                HashMap<String, String> mmTempData = new HashMap<>();
-                mmTempData.put(Key.BUS_NODE_ID, mBusStationList.get(position).getBusNodeId());
-                mmTempData.put(Key.BUS_NODE_NAME, mBusStationList.get(position).getBusNodeName());
-                mmTempData.put(Key.BUS_NODE_NO, mBusStationList.get(position).getBusNodeNo());
-                AppData.GetInstance().SetSelectedNum(mContext, position);
-                if (mListener != null) {
-                    mListener.eventRemoveItem(mmTempData);
-                }
-                return false;
-            });
+//            mmBinding.busStopListContainer.setOnLongClickListener(v -> {
+//                int position = getAdapterPosition();
+//                HashMap<String, String> mmTempData = new HashMap<>();
+//                mmTempData.put(Key.BUS_NODE_ID, mBusStationList.get(position).getBusNodeId());
+//                mmTempData.put(Key.BUS_NODE_NAME, mBusStationList.get(position).getBusNodeName());
+//                mmTempData.put(Key.BUS_NODE_NO, mBusStationList.get(position).getBusNodeNo());
+//                AppData.GetInstance().SetSelectedNum(mContext, position);
+//                if (mListener != null) {
+//                    mListener.eventRemoveItem(mmTempData);
+//                }
+//                return false;
+//            });
+        }
+
+        Observable<BusStation> getLongClickObserver(BusStation item) {
+            return Observable.create(e -> mmBinding.busStopListContainer.setOnLongClickListener(
+                    v -> {
+                        e.onNext(item);
+                        Timber.tag("checkCheck").d("item : %s", item.getBusNodeName());
+                        return false;
+                    }
+            ));
         }
     }
 
@@ -192,8 +214,18 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+    public void updateItems(ArrayList<BusStation> busData){
+        mBusStationList.clear();
+        mBusStationList.addAll(busData);
+    }
+
     public interface Listener {
         public void addBusStation();
-        public void eventRemoveItem(HashMap<String, String> busData);
+
+        public void eventRemoveItem(BusStop busStopData);
+    }
+
+    public PublishSubject<BusStation> getItemPublishSubject() {
+        return mPublishSubject;
     }
 }
