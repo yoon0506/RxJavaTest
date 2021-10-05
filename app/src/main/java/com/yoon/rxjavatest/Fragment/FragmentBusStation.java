@@ -62,7 +62,6 @@ public class FragmentBusStation extends Fragment {
 
     // bus
     private ArrayList<BusStation> mBusStationList = new ArrayList<>(AppData.GetInstance().mBusStationList);
-    private static final String ROWS = "300";
 
     private Listener mListener = null;
 
@@ -132,7 +131,7 @@ public class FragmentBusStation extends Fragment {
 
     private void rxArvlInfoInquireService(String mmNodeId) {
         RxArvlInfoInquireService.BusArvlInfo mmService = RxArvlInfoInquireService.getInstance().getServiceAPI();
-        Observable<Example> mmObservable = mmService.getObArvlInfo(Key.SERVICE_KEY, Key.CITY_CODE, mmNodeId, ROWS, Key.TYPE_JSON);
+        Observable<Example> mmObservable = mmService.getObArvlInfo(Key.SERVICE_KEY, Key.CITY_CODE, mmNodeId, Key.ROWS, Key.TYPE_JSON);
 
         mCompositeDisposable = new CompositeDisposable();
         mCompositeDisposable.add(

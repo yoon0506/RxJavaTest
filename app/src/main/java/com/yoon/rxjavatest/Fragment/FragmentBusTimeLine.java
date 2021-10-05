@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 
 import com.yoon.rxjavatest.Adapter.AdapterBusTimeLine;
 import com.yoon.rxjavatest.R;
-import com.yoon.rxjavatest.Request.RequestRouteAcctoBusList;
 import com.yoon.rxjavatest.busData.BusTimeLine;
 import com.yoon.rxjavatest.databinding.FragmentBusTimeLineBinding;
 

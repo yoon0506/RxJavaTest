@@ -20,14 +20,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.yoon.rxjavatest.Adapter.AdapterBusList;
 import com.yoon.rxjavatest.Api.Example;
-import com.yoon.rxjavatest.Api.Item;
 import com.yoon.rxjavatest.AppData;
 import com.yoon.rxjavatest.Define;
 import com.yoon.rxjavatest.Key;
 import com.yoon.rxjavatest.R;
-import com.yoon.rxjavatest.Request.RequestBusRouteInfoInquireService;
-import com.yoon.rxjavatest.Request.RequestRouteAcctoBusList;
-import com.yoon.rxjavatest.Request.RequestRxRouteAcctoBusList;
 import com.yoon.rxjavatest.busData.BusStop;
 import com.yoon.rxjavatest.busData.BusTimeLine;
 import com.yoon.rxjavatest.busData.SaveManagerBusList;
@@ -35,7 +31,6 @@ import com.yoon.rxjavatest.databinding.FragmentBusBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -56,10 +51,6 @@ public class FragmentBus extends Fragment {
     public FragmentBusTimeLine mFragmentBusTimeLine;
     private FragmentLoading mFragmentLoading;
     public FragmentError mFragmentError;
-
-    // request
-    private RequestRouteAcctoBusList mRequestRouteAcctoBusList;
-    private RequestRxRouteAcctoBusList mRequestRxRouteAcctoBusList;
 
     private View mFooterView;
     private AdapterBusList mAdapterBusList;
@@ -366,39 +357,39 @@ public class FragmentBus extends Fragment {
     }
 
     private void startRx() {
-        mRouteId = "CCB250020001";
-        RequestBusRouteInfoInquireService.RouteAcctoBus mmService = RequestBusRouteInfoInquireService.getInstance().getServiceAPI();
-//        Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE, mRouteId, Key.TYPE_JSON);
-        Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE);
-
-        mCompositeDisposable = new CompositeDisposable();
-        mCompositeDisposable.add(
-                mmObservable.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new DisposableObserver<Example>() {
-                                           @Override
-                                           public void onNext(@NonNull Example strings) {
-//                                               for (Example data : strings) {
-//                                                   Timber.tag("checkCheck").d("data : %s", data.toString());
-//                                               }
-                                               Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
-//                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
-//                                               Item busData = strings.getResponse().getBody().getItems().getItem();
-
-                                           }
-
-                                           @Override
-                                           public void onError(@NonNull Throwable e) {
-                                               Timber.tag("checkCheck").d("e : %s", e);
-                                           }
-
-                                           @Override
-                                           public void onComplete() {
-
-                                           }
-
-                                       }
-                        ));
+//        mRouteId = "CCB250020001";
+//        RequestBusRouteInfoInquireService.RouteAcctoBus mmService = RequestBusRouteInfoInquireService.getInstance().getServiceAPI();
+////        Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE, mRouteId, Key.TYPE_JSON);
+//        Observable<Example> mmObservable = mmService.getObBus(Key.SERVICE_KEY, Key.CITY_CODE);
+//
+//        mCompositeDisposable = new CompositeDisposable();
+//        mCompositeDisposable.add(
+//                mmObservable.subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribeWith(new DisposableObserver<Example>() {
+//                                           @Override
+//                                           public void onNext(@NonNull Example strings) {
+////                                               for (Example data : strings) {
+////                                                   Timber.tag("checkCheck").d("data : %s", data.toString());
+////                                               }
+//                                               Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
+////                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+////                                               Item busData = strings.getResponse().getBody().getItems().getItem();
+//
+//                                           }
+//
+//                                           @Override
+//                                           public void onError(@NonNull Throwable e) {
+//                                               Timber.tag("checkCheck").d("e : %s", e);
+//                                           }
+//
+//                                           @Override
+//                                           public void onComplete() {
+//
+//                                           }
+//
+//                                       }
+//                        ));
     }
 
 

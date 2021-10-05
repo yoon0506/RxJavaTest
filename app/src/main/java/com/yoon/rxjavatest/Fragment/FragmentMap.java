@@ -4,21 +4,18 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PointF;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,27 +39,35 @@ import com.naver.maps.map.UiSettings;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.overlay.OverlayImage;
 import com.naver.maps.map.widget.ZoomControlView;
+import com.yoon.rxjavatest.Api.Example;
+import com.yoon.rxjavatest.Api.Item;
 import com.yoon.rxjavatest.AppData;
 import com.yoon.rxjavatest.Define;
 import com.yoon.rxjavatest.Key;
 import com.yoon.rxjavatest.R;
-import com.yoon.rxjavatest.Request.RequestBusInformation;
+import com.yoon.rxjavatest.Request.RxArvlInfoInquireService;
 import com.yoon.rxjavatest._Library._Popup;
 import com.yoon.rxjavatest.busData.BusSelection;
+import com.yoon.rxjavatest.busData.BusStation;
+import com.yoon.rxjavatest.busData.BusStationDetail;
 import com.yoon.rxjavatest.busData.BusStopFromCSV;
 import com.yoon.rxjavatest.databinding.FragmentMapBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class FragmentMap extends Fragment implements OnMapReadyCallback {
     private FragmentMap This = this;
     private FragmentMapBinding mBinding;
-
-   // Request
-    private RequestBusInformation mRequestBusInformation;
-//    private RequestBusNodeDetailInfo mRequestBusNodeDetailInfo;
-//    private RequestBusRouteInfo mRequestBusRouteInfo;
 
     // Fragment
     public FragmentBusSelection mFragmentBusSelection;
@@ -72,7 +77,10 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
     private Marker[] mMarker;
     public Marker mSelectedMarker;
     private TextView[] mTextView;
-    //
+    // rxjava
+    private Disposable mDisposable;
+    private CompositeDisposable mCompositeDisposable;
+
     // map
     public ZoomControlView mZoomControlView;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -244,7 +252,6 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
         getCurrentUserLocation();
     }
 
-
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
@@ -363,7 +370,6 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
             }
             mIsLoadingDone = true;
             if (mListener != null) {
-//                mIsSuccLoading = true;
                 mListener.didRespond(This, Define.LOADING_COMPLETE, null);
             }
         }
@@ -379,42 +385,37 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
         return Math.acos(Math.sin(x) * Math.sin(y) + Math.cos(x) * Math.cos(y) * Math.cos(d2r * (ln1 - ln2))) * d2km;
     }
 
-    // ㅇㅇㅇㅇㅇ추후에 rx로 변경
+    // ㅇㅇㅇㅇㅇ추후에 rx로 변경 필요
     private void showBusStopInfo2() {
         mBusNodeNumber = mSelectedBusData.getBusNodeNum();
         mBusNodeName = mSelectedBusData.getBusStopName();
         mBusNodeId = mSelectedBusData.getBusNodeId();
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        getActivity().runOnUiThread(() -> {
+            mBinding.busStopInfoContainerMap.setVisibility(View.VISIBLE);
+            mBinding.busStopInfoSmallContainerMap.setVisibility(View.VISIBLE);
+            mBinding.busStopInfoSmallContainerMap.setOnClickListener(v -> {
+                if (mBinding.busStopInfoSmallContainerMap.getVisibility() == View.VISIBLE) {
+                    return;
+                }
+            });
+            mBinding.nextBtnMap.setOnClickListener(v -> {
+                if (!mIsRequestData) {
+                    clickNextBtn();
+                } else {
+                    Toast.makeText(getContext(), "데이터를 불러오는 중입니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-                mBinding.busStopInfoContainerMap.setVisibility(View.VISIBLE);
-                mBinding.busStopInfoSmallContainerMap.setVisibility(View.VISIBLE);
-
-                mBinding.busStopInfoSmallContainerMap.setOnClickListener(v -> {
-                    if (mBinding.busStopInfoSmallContainerMap.getVisibility() == View.VISIBLE) {
-                        return;
-                    }
-                });
-                mBinding.nextBtnMap.setOnClickListener(v -> {
-                    if (!mIsRequestData) {
-                        clickNextBtn();
-                    } else {
-                        Toast.makeText(getContext(), "데이터를 불러오는 중입니다.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                mBinding.busStopNumberMap.setText(mSelectedBusData.getBusNodeNum());
-                mBinding.busStopNameMap.setText(mSelectedBusData.getBusStopName());
-                if (mSelectedBusData.getNextBusStopName() != null) {
-                    if (mSelectedBusData.getNextBusStopName().equals("종점")) {
-                        mBinding.nextButStopName.setText(mSelectedBusData.getNextBusStopName());
-                        mBusNextStop = mSelectedBusData.getNextBusStopName();
-                    } else {
-                        mBinding.nextButStopName.setText(mSelectedBusData.getNextBusStopName() + " 방향");
-                        mBusNextStop = mSelectedBusData.getNextBusStopName();
-                    }
+            mBinding.busStopNumberMap.setText(mSelectedBusData.getBusNodeNum());
+            mBinding.busStopNameMap.setText(mSelectedBusData.getBusStopName());
+            if (mSelectedBusData.getNextBusStopName() != null) {
+                if (mSelectedBusData.getNextBusStopName().equals("종점")) {
+                    mBinding.nextButStopName.setText(mSelectedBusData.getNextBusStopName());
+                    mBusNextStop = mSelectedBusData.getNextBusStopName();
+                } else {
+                    mBinding.nextButStopName.setText(mSelectedBusData.getNextBusStopName() + " 방향");
+                    mBusNextStop = mSelectedBusData.getNextBusStopName();
                 }
             }
         });
@@ -427,56 +428,49 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
             mBusSelectionDataList = null;
             mBusSelectionDataList = new ArrayList<>();
         }
-        mTempLoadingTime = AppData.GetInstance().GetLoadingTimer(getContext());
-        AppData.GetInstance().SetLoadingTimer(getContext(), 40000);
-        if (mListener != null) {
-            mListener.didRespond(This, Define.LOADING + "getBusData", null);
-        }
-        requestBusNodeDetailInfo();
+        rxArvlInfoInquireService(mBusNodeId);
     }
 
     private ArrayList<HashMap<String, String>> mmBusInfoMapList;
 
-    private void requestBusNodeDetailInfo() {
-//        mIsRequestData = true;
-//
-//        String mmUserID = AppData.GetInstance().GetUserID(getContext());
-//        String mmBusNodeID = mBusNodeId;
-//
-//        mRequestBusNodeDetailInfo = new RequestBusNodeDetailInfo();
-//        mRequestBusNodeDetailInfo.request(mmUserID, mmBusNodeID, new RequestBusNodeDetailInfo.Listener() {
-//            @Override
-//            public void didRespond(RequestRoot request, HashMap<String, Object> properties, String error) {
-//                if (error.equals("0")) {
-//                    String mmTempUserID = properties.get(Key.USER_ID).toString();
-//                    if (mmUserID.equals(mmTempUserID)) {
-//                        if (properties.get(Key.ROUTE_LIST) != null) {
-//                            ArrayList<HashMap<String, String>> mmList = (ArrayList) properties.get(Key.ROUTE_LIST);
-//                            mmBusInfoMapList = new ArrayList<>();
-//                            for (int i = 0; i < mmList.size(); i++) {
-//                                HashMap<String, String> mmMap = mmList.get(i);
-//                                mmBusInfoMapList.add(mmMap);
-//                            }
-//                            mTotalDataCnt = mmBusInfoMapList.size();
-//                            if (mDataCnt < mTotalDataCnt) {
-//                                mBusRouteId = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_ID);
-//                                String mmBusRouteNo = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_ROUTE_NO);
-//                                mBusNextStop = mmBusInfoMapList.get(mDataCnt).get(Key.BUS_NEXT_STOP);
-//                                requestBusInformation(mmBusRouteNo);
-//                            }
-//                        }
-//                    } else {
-//                        if (mListener != null) {
-//                            mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-//                        }
-//                    }
-//                } else {
-//                    if (mListener != null) {
-//                        mListener.didRespond(This, Define.LOADING_COMPLETE, null);
-//                    }
-//                }
-//            }
-//        });
+
+    private void rxArvlInfoInquireService(String mmNodeId) {
+        RxArvlInfoInquireService.BusArvlInfo mmService = RxArvlInfoInquireService.getInstance().getServiceAPI();
+        Observable<Example> mmObservable = mmService.getObArvlInfo(Key.SERVICE_KEY, Key.CITY_CODE, mmNodeId, Key.ROWS, Key.TYPE_JSON);
+
+        mCompositeDisposable = new CompositeDisposable();
+        mCompositeDisposable.add(
+                mmObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new DisposableObserver<Example>() {
+                                           @Override
+                                           public void onNext(@NonNull Example strings) {
+                                               Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
+                                               List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+                                               ArrayList<BusStationDetail> mmBusStationDetailList = new ArrayList<>();
+                                               for (Item data : busData) {
+                                                   BusStationDetail detailData = new BusStationDetail(data.getArrprevstationcnt() + "", data.getArrtime() + "", data.getNodeid(), data.getNodenm(), data.getRouteid(), data.getRouteno(), data.getRoutetp());
+                                                   mmBusStationDetailList.add(detailData);
+                                               }
+                                               
+//                                               Item busData = strings.getResponse().getBody().getItems().getItem();
+//                                               BusStationDetail detailData = new BusStationDetail(busData.getArrprevstationcnt() + "", busData.getArrtime() + "", busData.getNodeid(), busData.getNodenm(), busData.getRouteid(), busData.getRouteno(), busData.getRoutetp());
+//                                               mmBusStationDetailList.add(detailData);
+
+                                           }
+
+                                           @Override
+                                           public void onError(@NonNull Throwable e) {
+                                               Timber.tag("checkCheck").d("e : %s", e);
+                                           }
+
+                                           @Override
+                                           public void onComplete() {
+
+                                           }
+
+                                       }
+                        ));
     }
 
     // 1. "버스 노선 조회 서비스"의 "노선번호목록조회" 기능으로 버스 번호를 입력해 해당 버스 번호(노선 번호의) 출발점, 종점 정류소 데이터를 얻는다.
@@ -623,6 +617,7 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
     }
 
     // 버스정류장 이름으로 버스정류장 찾는 메소드
+    @SuppressLint("SetTextI18n")
     private void searchBusStop(String searchTxt) {
 
         boolean mmIsExist = false;
@@ -659,37 +654,34 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
                         }
                     }
                     mTextView = new TextView[mmSearchResultTxtList.size()];
-                    for (int i = 0; i < mmSearchResultTxtList.size(); i++) {
-                        mTextView[i] = new TextView(getContext());
+
+                    int mmCnt = 0;
+                    for(BusStopFromCSV busStopCSVData : mmSearchResultTxtList){
+                        mTextView[mmCnt] = new TextView(getContext());
                         LinearLayout.LayoutParams mBtnParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                        if (i == 0) {
+                        if (mmCnt == 0) {
                             mBtnParams.setMargins(30, 30, 30, 20);
-                        } else if (i == mmSearchResultTxtList.size() - 1) {
+                        } else if (mmCnt == mmSearchResultTxtList.size() - 1) {
                             mBtnParams.setMargins(30, 20, 30, 30);
                         } else {
                             mBtnParams.setMargins(30, 20, 30, 20);
                         }
-                        mTextView[i].setText(mmSearchResultTxtList.get(i).getBusStopName() + "(" + mmSearchResultTxtList.get(i).getNextBusStopName() + " 방향)");
-                        mTextView[i].setTag(mmSearchResultTxtList.get(i).getBusStopName());
-                        mTextView[i].setLayoutParams(mBtnParams);
-                        mTextView[i].setTextSize(16);
-                        int finalI = i;
-                        mTextView[i].setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                for (int i = 0; i < AppData.GetInstance().mCSVBusStopList.size(); i++) {
-                                    if (AppData.GetInstance().mCSVBusStopList.get(i).getBusStopName().equals(mTextView[finalI].getTag())) {
-                                        if (AppData.GetInstance().mCSVBusStopList.get(i).getBusNodeId().equals(mmSearchResultTxtList.get(finalI).getBusNodeId())) {
-                                            mSelectedBusData = AppData.GetInstance().mCSVBusStopList.get(i);
-                                            i = AppData.GetInstance().mCSVBusStopList.size();
-                                        }
-                                    }
+                        mTextView[mmCnt].setText(busStopCSVData.getBusStopName() + "(" + busStopCSVData.getNextBusStopName() + " 방향)");
+                        mTextView[mmCnt].setTag(busStopCSVData.getBusStopName());
+                        mTextView[mmCnt].setLayoutParams(mBtnParams);
+                        mTextView[mmCnt].setTextSize(16);
+                        int finalI = mmCnt;
+                        mTextView[mmCnt].setOnClickListener(v -> {
+                            if (busStopCSVData.getBusStopName().equals(mTextView[finalI].getTag())) {
+                                if (busStopCSVData.getBusNodeId().equals(mmSearchResultTxtList.get(finalI).getBusNodeId())) {
+                                    mSelectedBusData = busStopCSVData;
                                 }
-                                setSelectedEvent(mSelectedBusData);
                             }
+                            setSelectedEvent(mSelectedBusData);
                         });
-                        mBinding.searchResultSmallContainer.addView(mTextView[i]);
-                    }
+                        mBinding.searchResultSmallContainer.addView(mTextView[mmCnt]);
+                        mmCnt++;
+                   }
                 }
             } else {
                 mHandler.postDelayed(new Runnable() {
@@ -754,6 +746,5 @@ public class FragmentMap extends Fragment implements OnMapReadyCallback {
     public interface Listener {
         public void didRespond(Fragment fragment, String event, HashMap<String, String> data);
     }
-
 }
 

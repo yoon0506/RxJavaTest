@@ -34,6 +34,7 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private Context mContext;
     private ArrayList<BusStation> mBusStationList;
+    private BusStationViewHolder mMainHolder;
 
     // 도착예정인 버스 정보 노출 수.
     private static final int SHOW_BUS_COUNT = 5;
@@ -47,6 +48,7 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
     public AdapterBusStation(Context mContext, ArrayList<BusStation> mBusStationList) {
         this.mContext = mContext;
         this.mBusStationList = mBusStationList;
+
     }
 
     @NonNull

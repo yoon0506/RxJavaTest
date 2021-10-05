@@ -32,7 +32,7 @@ public class Define {
     public static final String EVENT_SET_LAYOUT = "event_set_layout";
 
     // 특정 정거장 전이면 버스 알림
-    public final static int NOTI_BUS_ARRIVAL_CNT = 5;
+    public static final int NOTI_BUS_ARRIVAL_CNT = 5;
 
     public static final String CC_TRANS_CHANNEL = "ccTransportationChannel";
     public static final String CC_TRANS_CHANNEL_NAME = "춘천 버스 알림";
@@ -63,7 +63,4 @@ public class Define {
     public static final String APP_EXIT = "앱 종료";
     public static final String VERIFICATION_MSG = "인증하기";
     public static final String REFUSAL = "거부";
-
-    /** 로그캣 */
-    public static final String TAG_HTTP = "HTTP_CONNECTION";
 }
