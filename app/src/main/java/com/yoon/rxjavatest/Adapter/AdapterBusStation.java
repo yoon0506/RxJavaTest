@@ -55,8 +55,8 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view;
-        RecyclerView.ViewHolder holder;
+        View view = null;
+        RecyclerView.ViewHolder holder = null;
         if (viewType == TYPE_ITEM) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cell_bus_station_list, parent, false);
             holder = new BusStationViewHolder(view);
@@ -86,8 +86,8 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
             mainHolder.mmBinding.busNextStopName.setText(mmBusNextStop);
             // 버스 도착정보 리스트
 
+            mainHolder.mmBinding.busLayoutContainer.setOrientation(LinearLayout.VERTICAL);
             if (mBusStationList.get(position).getArrivalBusInfo().size() > 0) {
-                mainHolder.mmBinding.busLayoutContainer.setOrientation(LinearLayout.VERTICAL);
                 for (BusStationDetail busDetailData : mBusStationList.get(position).getArrivalBusInfo()) {
                     View mmBusDetailView = ((Activity) mContext).getLayoutInflater().inflate(R.layout.cell_bus_station_detail, null, false);
                     // 버스 번호
@@ -127,15 +127,8 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
                     }
                     mainHolder.mmBinding.busLayoutContainer.addView(mmBusDetailView);
                 }
-                // 버스 정류장의 마지막줄이면 밑에 여백추가
-//                    if(i == mBusStationList.size()-1){
-//                        RelativeLayout mmMarginBottom = mmBusDetailView.findViewById(R.id.marginBottom);
-//                        mmMarginBottom.setVisibility(View.VISIBLE);
-//                    }
-
                 // 버스의 도착정보가 없다면
             } else {
-                mainHolder.mmBinding.busLayoutContainer.setOrientation(LinearLayout.VERTICAL);
                 View mmBusDetailView = ((Activity) mContext).getLayoutInflater().inflate(R.layout.cell_no_bus, null, false);
                 mainHolder.mmBinding.busLayoutContainer.addView(mmBusDetailView);
                 Timber.d("노뻐쓰");
@@ -165,19 +158,6 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
         public BusStationViewHolder(@NonNull View itemView) {
             super(itemView);
             mmBinding = DataBindingUtil.bind(itemView);
-
-//            mmBinding.busStopListContainer.setOnLongClickListener(v -> {
-//                int position = getAdapterPosition();
-//                HashMap<String, String> mmTempData = new HashMap<>();
-//                mmTempData.put(Key.BUS_NODE_ID, mBusStationList.get(position).getBusNodeId());
-//                mmTempData.put(Key.BUS_NODE_NAME, mBusStationList.get(position).getBusNodeName());
-//                mmTempData.put(Key.BUS_NODE_NO, mBusStationList.get(position).getBusNodeNo());
-//                AppData.GetInstance().SetSelectedNum(mContext, position);
-//                if (mListener != null) {
-//                    mListener.eventRemoveItem(mmTempData);
-//                }
-//                return false;
-//            });
         }
 
         Observable<BusStation> getLongClickObserver(BusStation item) {
@@ -205,8 +185,16 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    public void updateItems(ArrayList<BusStation> busData){
+    private void clearData(){
+        int mmSize = mBusStationList.size();
         mBusStationList.clear();
+        notifyItemRangeRemoved(0, mmSize);
+        Timber.tag("checkCheck").d("clearData");
+        notifyDataSetChanged();
+    }
+
+    public void updateItems(ArrayList<BusStation> busData){
+        clearData();
         mBusStationList.addAll(busData);
     }
 

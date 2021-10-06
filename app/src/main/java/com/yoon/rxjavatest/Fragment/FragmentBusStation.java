@@ -92,28 +92,24 @@ public class FragmentBusStation extends Fragment {
             mBinding.timeLineListView.setLayoutManager(new LinearLayoutManager(getContext()));
             mAdapterBusStation.updateItems(mBusStationList);
             // add btn event
-            mAdapterBusStation.setListener(() -> {
-                showFragmentMapBusStation();
-            });
+            mAdapterBusStation.setListener(() -> showFragmentMapBusStation());
             // long click event
             mAdapterBusStation.getItemPublishSubject()
-                    .subscribe(busStation -> {
-                        _Popup.GetInstance().ShowBinaryPopup(getContext(), busStation.getBusNodeName() + " " + Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
-                                (mainMessage, selectMessage) -> {
-                                    if (selectMessage.equals("확인")) {
-                                        for (BusStation data : mBusStationList) {
-                                            if (data.getBusNodeId().equals(busStation.getBusNodeId())) {
-                                                AppData.GetInstance().mBusStationDetailList.remove(data);
-                                            }
-                                        }
-                                        for (BusStation data : mBusStationList) {
-                                            if (busStation.getBusNodeId().contains(data.getBusNodeId())) {
-                                                AppData.GetInstance().mBusStationList.remove(data);
-                                            }
+                    .subscribe(busStation -> _Popup.GetInstance().ShowBinaryPopup(getContext(), busStation.getBusNodeName() + " " + Define.DELETE_BUS_STATION_INFORM, Define.CONFIRM_MSG, Define.CANCEL_MSG,
+                            (mainMessage, selectMessage) -> {
+                                if (selectMessage.equals("확인")) {
+                                    for (BusStation data : mBusStationList) {
+                                        if (data.getBusNodeId().equals(busStation.getBusNodeId())) {
+                                            AppData.GetInstance().mBusStationDetailList.remove(data);
                                         }
                                     }
-                                });
-                    });
+                                    for (BusStation data : mBusStationList) {
+                                        if (busStation.getBusNodeId().contains(data.getBusNodeId())) {
+                                            AppData.GetInstance().mBusStationList.remove(data);
+                                        }
+                                    }
+                                }
+                            }));
 
             // 새로고침 버튼
             mBinding.updateBtn.setOnClickListener(v -> updateBusStationList());
@@ -137,19 +133,19 @@ public class FragmentBusStation extends Fragment {
                 .map(item -> {
                     Timber.tag("checkCheck").d("strings.toString() : %s", strings.toString());
                     List<Item> busData = strings.getResponse().getBody().getItems().getItem();
+
                     ArrayList<BusStationDetail> mmBusStationDetailList = new ArrayList<>();
                     String mmBusStationDetailNodeId = "";
+
                     for (Item data : busData) {
                         BusStationDetail detailData = new BusStationDetail(data.getArrprevstationcnt() + "", data.getArrtime() + "", data.getNodeid(), data.getNodenm(), data.getRouteid(), data.getRouteno(), data.getRoutetp());
                         mmBusStationDetailNodeId = detailData.getNodeId();
                         mmBusStationDetailList.add(detailData);
                     }
-
-                    for (BusStation busStationData : mBusStationList) {
-                        if (mmBusStationDetailNodeId.contains(busStationData.getBusNodeId())) {
-                            busStationData.setArrivalBusInfo(mmBusStationDetailList);
-                        }
+                    if (item.getBusNodeId().contains(mmBusStationDetailNodeId)) {
+                        item.setArrivalBusInfo(mmBusStationDetailList);
                     }
+
                     return mBusStationList;
                 });
     }
@@ -160,8 +156,8 @@ public class FragmentBusStation extends Fragment {
 
         mCompositeDisposable = new CompositeDisposable();
         mCompositeDisposable.add(
-                // 10초 마다 반복.
-                mmObservable.interval(10000, TimeUnit.MILLISECONDS)
+                // 10초 마다 api call.
+                mmObservable.interval(0, 10000, TimeUnit.MILLISECONDS)
                         .flatMap(n -> mmObservable)
                         .repeat()
                         .subscribeOn(Schedulers.io())

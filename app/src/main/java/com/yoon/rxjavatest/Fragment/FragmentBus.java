@@ -422,7 +422,6 @@ public class FragmentBus extends Fragment {
     }
 
     private void setAdapter() {
-        Timber.tag("checkCheck").d("어뎁터");
         if (!mGetDataDone) {
 
             mAdapterBusList = new AdapterBusList(getContext(), AppData.GetInstance().mBusStopList, This);
@@ -508,7 +507,6 @@ public class FragmentBus extends Fragment {
                     });
                 }
                 // 버스 추가 더하기 버튼
-                Timber.tag("checkCheck").d("안녕");
                 mAddBusBtn.setOnClickListener(v -> showFragmentMap());
 
 //                getActivity().runOnUiThread(new Runnable() {
