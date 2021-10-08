@@ -394,7 +394,7 @@ public class FragmentMapBusStation extends Fragment implements OnMapReadyCallbac
                     if (mmBusStationList.size() > 0) {
                         for (int i = 0; i < mmBusStationList.size(); i++) {
                             if (mmBusStationList.get(i).getBusNodeId().equals(mBusNodeId)
-                                    && mmBusStationList.get(i).getBusNodeNo().equals(mBusNodeNo)
+//                                    && mmBusStationList.get(i).getBusNodeNo().equals(mBusNodeNo)
                                     && mmBusStationList.get(i).getBusNodeName().equals(mBusStopName)) {
                                 mIsExist = true;
                             }

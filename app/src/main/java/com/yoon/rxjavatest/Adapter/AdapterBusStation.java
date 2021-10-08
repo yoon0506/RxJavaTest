@@ -55,8 +55,8 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = null;
-        RecyclerView.ViewHolder holder = null;
+        View view;
+        RecyclerView.ViewHolder holder;
         if (viewType == TYPE_ITEM) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cell_bus_station_list, parent, false);
             holder = new BusStationViewHolder(view);
@@ -85,7 +85,6 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
             mainHolder.mmBinding.busStopName.setText(mBusStationList.get(position).getBusNodeName());
             mainHolder.mmBinding.busNextStopName.setText(mmBusNextStop);
             // 버스 도착정보 리스트
-
             mainHolder.mmBinding.busLayoutContainer.setOrientation(LinearLayout.VERTICAL);
             if (mBusStationList.get(position).getArrivalBusInfo().size() > 0) {
                 for (BusStationDetail busDetailData : mBusStationList.get(position).getArrivalBusInfo()) {
@@ -133,7 +132,6 @@ public class AdapterBusStation extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mainHolder.mmBinding.busLayoutContainer.addView(mmBusDetailView);
                 Timber.d("노뻐쓰");
             }
-
             mainHolder.getLongClickObserver(mBusStationList.get(position)).subscribe(mPublishSubject);
         }
     }

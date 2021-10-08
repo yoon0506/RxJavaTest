@@ -99,15 +99,16 @@ public class FragmentBusStation extends Fragment {
                             (mainMessage, selectMessage) -> {
                                 if (selectMessage.equals("확인")) {
                                     for (BusStation data : mBusStationList) {
-                                        if (data.getBusNodeId().equals(busStation.getBusNodeId())) {
-                                            AppData.GetInstance().mBusStationDetailList.remove(data);
-                                        }
-                                    }
-                                    for (BusStation data : mBusStationList) {
                                         if (busStation.getBusNodeId().contains(data.getBusNodeId())) {
                                             AppData.GetInstance().mBusStationList.remove(data);
                                         }
                                     }
+                                    mBusStationList = new ArrayList<>();
+                                    mBusStationList.addAll(AppData.GetInstance().mBusStationList);
+                                    mAdapterBusStation.updateItems(mBusStationList);
+                                    mAdapterBusStation.notifyDataSetChanged();
+
+                                    saveByPreference(createSaveData());
                                 }
                             }));
 
@@ -176,19 +177,17 @@ public class FragmentBusStation extends Fragment {
                                                            .subscribe(item -> {
                                                                mAdapterBusStation.updateItems(item);
                                                                mAdapterBusStation.notifyDataSetChanged();
+                                                               // 버스 정류장 데이터 갱신
+                                                               mBusStationList = item;
+                                                               AppData.GetInstance().SetBusStationList(mBusStationList);
                                                            });
-
-                                                   // 버스 정류장 데이터 갱신
-                                                   AppData.GetInstance().SetBusStationList(mBusStationList);
 //                                                   mBinding.timeLineListView.setAdapter(mAdapterBusStation);
                                                }
                                            }
-
                                            @Override
                                            public void onError(@NonNull Throwable e) {
                                                Timber.tag("checkCheck").d("e : %s", e);
                                            }
-
                                            @Override
                                            public void onComplete() {
                                            }
@@ -208,6 +207,10 @@ public class FragmentBusStation extends Fragment {
                     new Thread((Runnable) () -> getActivity().runOnUiThread((Runnable) () -> ((FrameLayout) getActivity().findViewById(R.id.mainFullFrame)).setVisibility(View.GONE)));
                 } else if (event.equals(Define.EVENT_DONE) && data == null) {
                     // 버스 정류장 추가
+                    mBusStationList = new ArrayList<>();
+                    mBusStationList.addAll(AppData.GetInstance().mBusStationList);
+                    mAdapterBusStation.updateItems(mBusStationList);
+                    mAdapterBusStation.notifyDataSetChanged();
                     saveByPreference(createSaveData());
 
                     // ㅇㅇㅇㅇㅇ추후rx로 수정
@@ -269,6 +272,7 @@ public class FragmentBusStation extends Fragment {
     private void saveByPreference(String data) {
         SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = mPref.edit();
+        editor.remove("busStationInfo");
         editor.putString("busStationInfo", data);
         editor.commit();
         Timber.d("saved!");
